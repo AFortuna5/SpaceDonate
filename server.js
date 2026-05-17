@@ -10,8 +10,12 @@ const ROOT = __dirname
 loadEnv()
 
 const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || `http://localhost:${PORT}`
-const CONNECTIONS_PATH = path.join(ROOT, '.oauth-connections.json')
+const DATA_DIR = path.join(ROOT, '.data')
+const USERS_PATH = path.join(DATA_DIR, 'users.json')
 const oauthStates = new Map()
+const sessions = new Map()
+const SESSION_COOKIE = 'sd_session'
+const SESSION_TTL_MS = 7 * 24 * 60 * 60 * 1000
 
 const OAUTH = {
   youtube: {
@@ -21,7 +25,7 @@ const OAUTH = {
     redirectUri: process.env.YOUTUBE_REDIRECT_URI || `${PUBLIC_BASE_URL}/auth/youtube/callback`,
     authUrl: 'https://accounts.google.com/o/oauth2/v2/auth',
     tokenUrl: 'https://oauth2.googleapis.com/token',
-    scope: 'https://www.googleapis.com/auth/youtube.readonly'
+    scope: 'openid email profile https://www.googleapis.com/auth/youtube.readonly'
   },
   twitch: {
     name: 'Twitch',
@@ -68,17 +72,35 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && (url === '/' || url === '/index.html'))
       return serveFile(res, 'index.html', 'text/html; charset=utf-8')
 
+    if (req.method === 'GET' && url === '/login.html')
+      return serveFile(res, 'login.html', 'text/html; charset=utf-8')
+
     if (req.method === 'GET' && url === '/donate.html')
       return serveFile(res, 'donate.html', 'text/html; charset=utf-8')
 
     if (req.method === 'GET' && url === '/overlay.html')
       return serveFile(res, 'overlay.html', 'text/html; charset=utf-8')
 
+    if (req.method === 'GET' && url === '/dashboard.html')
+      return serveDashboard(req, res)
+
+    if (req.method === 'GET' && url === '/api/auth/me')
+      return getCurrentUser(req, res)
+
+    if (req.method === 'POST' && url === '/api/auth/signup')
+      return signup(req, res)
+
+    if (req.method === 'POST' && url === '/api/auth/login')
+      return login(req, res)
+
+    if (req.method === 'POST' && url === '/api/auth/logout')
+      return logout(req, res)
+
     if (req.method === 'GET' && url === '/api/alerts/stream')
       return handleSSE(req, res)
 
     if (req.method === 'GET' && url === '/api/connections')
-      return getConnections(res)
+      return getUserConnections(req, res)
 
     if (req.method === 'GET' && url === '/auth/youtube')
       return startOAuth(req, res, 'youtube')
@@ -103,7 +125,12 @@ const server = http.createServer(async (req, res) => {
 
     return sendJson(res, 404, { error: 'Rota não encontrada.' })
   } catch (err) {
-    console.error(err)
+    console.error('[SERVER ERROR]', {
+      url,
+      method: req.method,
+      error: err.message,
+      stack: err.stack
+    })
     return sendJson(res, 500, { error: 'Erro interno no servidor.' })
   }
 })
@@ -147,15 +174,152 @@ function handleSSE(req, res) {
 // ═══════════════════════════════════════════════════════════════════
 // CRIAR COBRANÇA (placeholder)
 // ═══════════════════════════════════════════════════════════════════
+// Auth.
+async function signup(req, res) {
+  const body = await readJson(req)
+  const email = normalizeEmail(body.email)
+  const password = String(body.password || '')
+  const creatorName = String(body.creatorName || '').trim().slice(0, 50)
+
+  if (!creatorName) return sendJson(res, 400, { error: 'Informe o nome do canal.' })
+  if (!isValidEmail(email)) return sendJson(res, 400, { error: 'Informe um e-mail valido.' })
+  if (password.length < 8) return sendJson(res, 400, { error: 'A senha precisa ter pelo menos 8 caracteres.' })
+
+  const users = await readUsers()
+  if (users.some(user => user.email === email))
+    return sendJson(res, 409, { error: 'Ja existe uma conta com este e-mail.' })
+
+  const user = {
+    id: crypto.randomUUID(),
+    creatorName,
+    email,
+    passwordHash: hashPassword(password),
+    createdAt: new Date().toISOString()
+  }
+  users.push(user)
+  await writeUsers(users)
+  createSession(res, user.id)
+  return sendJson(res, 201, { ok: true, user: publicUser(user) })
+}
+
+async function login(req, res) {
+  const body = await readJson(req)
+  const email = normalizeEmail(body.email)
+  const password = String(body.password || '')
+  const users = await readUsers()
+  const user = users.find(item => item.email === email)
+
+  if (!user || !verifyPassword(password, user.passwordHash))
+    return sendJson(res, 401, { error: 'E-mail ou senha invalidos.' })
+
+  createSession(res, user.id)
+  return sendJson(res, 200, { ok: true, user: publicUser(user) })
+}
+
+async function logout(req, res) {
+  const token = getSessionToken(req)
+  if (token) sessions.delete(token)
+  clearSessionCookie(res)
+  return sendJson(res, 200, { ok: true })
+}
+
+async function getCurrentUser(req, res) {
+  const user = await requireUser(req)
+  if (!user) return sendJson(res, 401, { user: null })
+  return sendJson(res, 200, { user: publicUser(user) })
+}
+
+async function serveDashboard(req, res) {
+  const user = await requireUser(req)
+  if (!user) return redirect(res, '/login.html?auth=login_required')
+  return serveFile(res, 'dashboard.html', 'text/html; charset=utf-8')
+}
+
+function createSession(res, userId) {
+  const token = crypto.randomBytes(32).toString('hex')
+  const expiresAt = Date.now() + SESSION_TTL_MS
+  sessions.set(token, { userId, expiresAt })
+  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=${token}; HttpOnly; SameSite=Lax; Path=/; Max-Age=${Math.floor(SESSION_TTL_MS / 1000)}`)
+}
+
+function clearSessionCookie(res) {
+  res.setHeader('Set-Cookie', `${SESSION_COOKIE}=; HttpOnly; SameSite=Lax; Path=/; Max-Age=0`)
+}
+
+async function requireUser(req) {
+  const token = getSessionToken(req)
+  if (!token) return null
+  const session = sessions.get(token)
+  if (!session) return null
+  if (session.expiresAt < Date.now()) {
+    sessions.delete(token)
+    return null
+  }
+  const users = await readUsers()
+  return users.find(user => user.id === session.userId) || null
+}
+
+function getSessionToken(req) {
+  return parseCookies(req.headers.cookie || '')[SESSION_COOKIE]
+}
+
+async function readUsers() {
+  try {
+    return JSON.parse(await fs.readFile(USERS_PATH, 'utf8'))
+  } catch (e) {
+    if (e.code === 'ENOENT') return []
+    throw e
+  }
+}
+
+async function writeUsers(users) {
+  await fs.mkdir(DATA_DIR, { recursive: true })
+  await fs.writeFile(USERS_PATH, JSON.stringify(users, null, 2))
+}
+
+function hashPassword(password) {
+  const salt = crypto.randomBytes(16).toString('hex')
+  const hash = crypto.pbkdf2Sync(password, salt, 210000, 32, 'sha256').toString('hex')
+  return `pbkdf2$sha256$210000$${salt}$${hash}`
+}
+
+function verifyPassword(password, stored) {
+  const [method, digest, iterations, salt, hash] = String(stored || '').split('$')
+  if (method !== 'pbkdf2' || digest !== 'sha256' || !iterations || !salt || !hash) return false
+  const candidate = crypto.pbkdf2Sync(password, salt, Number(iterations), 32, 'sha256')
+  const expected = Buffer.from(hash, 'hex')
+  return expected.length === candidate.length && crypto.timingSafeEqual(expected, candidate)
+}
+
+function normalizeEmail(email) {
+  return String(email || '').trim().toLowerCase()
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+function publicUser(user) {
+  return {
+    id: user.id,
+    creatorName: user.creatorName,
+    email: user.email,
+    createdAt: user.createdAt
+  }
+}
+
 // OAuth YouTube/Twitch.
 async function startOAuth(req, res, provider) {
   const cfg = OAUTH[provider]
+  const user = await requireUser(req)
+  if (!user) return redirect(res, '/login.html?auth=login_required')
+
   const missing = missingOAuthConfig(cfg, provider)
   if (missing.length)
-    return redirect(res, `/?oauth_error=${encodeURIComponent(`Configure ${missing.join(', ')} no .env antes de conectar ${cfg.name}.`)}`)
+    return redirect(res, `/login.html?oauth_error=${encodeURIComponent(`Configure ${missing.join(', ')} no .env antes de conectar ${cfg.name}.`)}`)
 
   const state = crypto.randomBytes(24).toString('hex')
-  oauthStates.set(state, { provider, createdAt: Date.now() })
+  oauthStates.set(state, { provider, userId: user.id, createdAt: Date.now() })
   pruneOAuthStates()
 
   const params = {
@@ -184,7 +348,7 @@ async function finishOAuth(req, res, provider) {
   const requestUrl = new URL(req.url, PUBLIC_BASE_URL)
   const error = requestUrl.searchParams.get('error')
   if (error)
-    return redirect(res, `/?oauth_error=${encodeURIComponent(`${cfg.name}: autorizacao cancelada ou negada.`)}`)
+    return redirect(res, `/login.html?oauth_error=${encodeURIComponent(`${cfg.name}: autorizacao cancelada ou negada.`)}`)
 
   const code = requestUrl.searchParams.get('code')
   const state = requestUrl.searchParams.get('state')
@@ -192,15 +356,19 @@ async function finishOAuth(req, res, provider) {
   const savedState = oauthStates.get(state)
 
   if (!code || !state || state !== cookieState || savedState?.provider !== provider)
-    return redirect(res, `/?oauth_error=${encodeURIComponent(`${cfg.name}: estado OAuth invalido. Tente conectar novamente.`)}`)
+    return redirect(res, `/login.html?oauth_error=${encodeURIComponent(`${cfg.name}: estado OAuth invalido. Tente conectar novamente.`)}`)
 
   oauthStates.delete(state)
 
   try {
+    const users = await readUsers()
+    const user = users.find(item => item.id === savedState.userId)
+    if (!user) return redirect(res, `/login.html?oauth_error=${encodeURIComponent(`${cfg.name}: usuario nao encontrado. Entre novamente.`)}`)
+
     const token = await exchangeCodeForToken(provider, code)
     const profile = await fetchProviderProfile(provider, token)
-    const connections = await readConnections()
-    connections[provider] = {
+    user.connections = user.connections || {}
+    user.connections[provider] = {
       connected: true,
       provider,
       displayName: profile.displayName,
@@ -209,11 +377,11 @@ async function finishOAuth(req, res, provider) {
       connectedAt: new Date().toISOString(),
       token
     }
-    await writeConnections(connections)
-    return redirect(res, `/?connected=${provider}`)
+    await writeUsers(users)
+    return redirect(res, `/dashboard.html?connected=${provider}`)
   } catch (err) {
     console.error(`[OAuth] ${cfg.name}`, err)
-    return redirect(res, `/?oauth_error=${encodeURIComponent(`${cfg.name}: falha ao concluir conexao. Confira client secret, redirect URI e scopes.`)}`)
+    return redirect(res, `/login.html?oauth_error=${encodeURIComponent(`${cfg.name}: falha ao concluir conexao. Confira client secret, redirect URI e scopes.`)}`)
   }
 }
 
@@ -266,8 +434,10 @@ async function fetchProviderProfile(provider, token) {
   }
 }
 
-async function getConnections(res) {
-  const connections = await readConnections()
+async function getUserConnections(req, res) {
+  const user = await requireUser(req)
+  if (!user) return sendJson(res, 401, { error: 'Entre para ver conexoes.' })
+  const connections = user.connections || {}
   return sendJson(res, 200, {
     youtube: publicConnection(connections.youtube),
     twitch: publicConnection(connections.twitch)
@@ -306,19 +476,6 @@ function parseCookies(header) {
     if (idx === -1) return ['', '']
     return [part.slice(0, idx).trim(), decodeURIComponent(part.slice(idx + 1).trim())]
   }).filter(([key]) => key))
-}
-
-async function readConnections() {
-  try {
-    return JSON.parse(await fs.readFile(CONNECTIONS_PATH, 'utf8'))
-  } catch (e) {
-    if (e.code === 'ENOENT') return {}
-    throw e
-  }
-}
-
-async function writeConnections(connections) {
-  await fs.writeFile(CONNECTIONS_PATH, JSON.stringify(connections, null, 2))
 }
 
 function redirect(res, location) {
@@ -459,11 +616,21 @@ async function serveFile(res, fileName, contentType) {
 
 async function readJson(req) {
   let raw = ''
-  for await (const chunk of req) {
-    raw += chunk
-    if (raw.length > 20_000) throw new Error('Payload muito grande.')
+  try {
+    for await (const chunk of req) {
+      raw += chunk
+      if (raw.length > 20_000) throw new Error('Payload muito grande.')
+    }
+    if (!raw) return {}
+    return JSON.parse(raw)
+  } catch (err) {
+    console.error('[readJson] Erro ao parsear JSON:', {
+      length: raw.length,
+      raw: raw.slice(0, 100),
+      error: err.message
+    })
+    throw err
   }
-  return raw ? JSON.parse(raw) : {}
 }
 
 function sendJson(res, status, data) {

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpaceDonate — Entrar</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.44.0/tabler-icons.min.css" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background: #0e0e10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      padding: 1.5rem;
+    }
+
+    .card {
+      background: #18181b;
+      border: 0.5px solid #2a2a2e;
+      border-radius: 12px;
+      padding: 2rem 2.5rem 1.75rem;
+      width: 100%;
+      max-width: 420px;
+    }
+
+    .logo {
+      font-size: 20px;
+      font-weight: 700;
+      color: #c8f135;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      letter-spacing: -0.3px;
+    }
+
+    /* TABS */
+    .tabs {
+      display: flex;
+      background: #0e0e10;
+      border-radius: 8px;
+      padding: 4px;
+      margin-bottom: 1.5rem;
+      border: 0.5px solid #2a2a2e;
+    }
+    .tab {
+      flex: 1;
+      padding: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      text-align: center;
+      border-radius: 6px;
+      border: none;
+      background: transparent;
+      color: #adadb8;
+      cursor: pointer;
+      transition: background 0.15s, color 0.15s;
+    }
+    .tab.active {
+      background: #18181b;
+      color: #efeff1;
+      border: 0.5px solid #2a2a2e;
+    }
+
+    /* PANELS */
+    .panel { display: none; flex-direction: column; gap: 12px; }
+    .panel.active { display: flex; }
+
+    /* FIELDS */
+    .field { display: flex; flex-direction: column; gap: 5px; }
+    .field label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #adadb8;
+      letter-spacing: 0.3px;
+    }
+    .field input {
+      background: #0e0e10;
+      border: 0.5px solid #2a2a2e;
+      border-radius: 7px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: #efeff1;
+      outline: none;
+      transition: border-color 0.15s;
+      width: 100%;
+    }
+    .field input:focus { border-color: #c8f135; }
+    .field input::placeholder { color: #4a4a55; }
+
+    /* PASSWORD WRAPPER */
+    .pass-wrap { position: relative; }
+    .pass-wrap input { padding-right: 40px; }
+    .pass-toggle {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: #6e6e7a;
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0;
+      line-height: 1;
+    }
+    .pass-toggle:hover { color: #adadb8; }
+
+    /* PRIMARY BUTTON */
+    .btn-primary {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: #c8f135;
+      color: #0e0e10;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: filter 0.15s, transform 0.1s;
+      margin-top: 4px;
+    }
+    .btn-primary:hover { filter: brightness(1.08); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    /* DIVIDER */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 4px 0;
+    }
+    .divider-line { flex: 1; height: 0.5px; background: #2a2a2e; }
+    .divider-text { font-size: 11px; color: #6e6e7a; white-space: nowrap; }
+
+    /* OAUTH BUTTONS */
+    .oauth-btn {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 11px 16px;
+      border-radius: 8px;
+      border: 0.5px solid #2a2a2e;
+      background: #0e0e10;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s, transform 0.1s;
+      text-decoration: none;
+    }
+    .oauth-btn:hover { background: #1f1f23; border-color: #444; }
+    .oauth-btn:active { transform: scale(0.985); }
+
+    .oauth-icon {
+      width: 30px;
+      height: 30px;
+      border-radius: 7px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .yt-icon { background: #ff0000; }
+    .tw-icon { background: #9146ff; }
+
+    .oauth-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #efeff1;
+      flex: 1;
+      text-align: left;
+    }
+    .oauth-arrow { font-size: 15px; color: #6e6e7a; }
+
+    /* TERMS */
+    .terms-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 12px;
+      color: #adadb8;
+      line-height: 1.5;
+    }
+    .terms-row input[type="checkbox"] {
+      margin-top: 2px;
+      accent-color: #c8f135;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .terms-row a { color: #c8f135; text-decoration: none; }
+    .terms-row a:hover { text-decoration: underline; }
+
+    /* FOOTER NOTE */
+    .footer-note {
+      font-size: 11px;
+      color: #6e6e7a;
+      text-align: center;
+      line-height: 1.6;
+      border-top: 0.5px solid #2a2a2e;
+      padding-top: 1rem;
+      margin-top: 4px;
+    }
+    .footer-note a { color: #c8f135; text-decoration: none; }
+    .footer-note a:hover { text-decoration: underline; }
+
+    /* TOAST */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(60px);
+      background: #1f1f23;
+      border: 0.5px solid #2a2a2e;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 13px;
+      color: #efeff1;
+      opacity: 0;
+      transition: transform 0.25s, opacity 0.25s;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 999;
+    }
+    .toast.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="logo">SpaceDonate</div>
+
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab('login')">Entrar</button>
+      <button class="tab" onclick="switchTab('register')">Criar conta</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="panel active" id="panel-login">
+      <div class="field">
+        <label for="login-email">E-mail</label>
+        <input type="email" id="login-email" placeholder="seu@email.com" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="login-pass">Senha</label>
+        <div class="pass-wrap">
+          <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" />
+          <button class="pass-toggle" onclick="togglePass('login-pass', this)" aria-label="Mostrar senha">
+            <i class="ti ti-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="handleEmailLogin()">Entrar</button>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-text">ou continue com</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <button class="oauth-btn" onclick="handleOAuth('youtube')">
+        <div class="oauth-icon yt-icon">
+          <svg width="18" height="13" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+            <path d="M19.582 2.186A2.507 2.507 0 0 0 17.824.42C16.27 0 10 0 10 0S3.73 0 2.176.42A2.507 2.507 0 0 0 .418 2.186 26.28 26.28 0 0 0 0 7a26.28 26.28 0 0 0 .418 4.814 2.507 2.507 0 0 0 1.758 1.766C3.73 14 10 14 10 14s6.27 0 7.824-.42a2.507 2.507 0 0 0 1.758-1.766A26.28 26.28 0 0 0 20 7a26.28 26.28 0 0 0-.418-4.814Z" fill="#fff"/>
+            <path d="M8 10l5.333-3L8 4v6Z" fill="#ff0000"/>
+          </svg>
+        </div>
+        <span class="oauth-name">Conectar YouTube (após login)</span>
+        <i class="ti ti-chevron-right oauth-arrow" aria-hidden="true"></i>
+      </button>
+
+      <button class="oauth-btn" onclick="handleOAuth('twitch')">
+        <div class="oauth-icon tw-icon">
+          <svg width="16" height="16" viewBox="0 0 24 28" fill="none" aria-hidden="true">
+            <path d="M2.1 0L0 5.6V24.5h6.3V28h3.5l3.5-3.5h5.25l7-7V0H2.1ZM21 16.1l-4.2 4.2H11.9L8.4 23.8v-3.5H3.5V2.1h17.5V16.1Z" fill="#fff"/>
+            <path d="M9.8 6.3H11.9v6.3H9.8V6.3ZM15.05 6.3h2.1v6.3h-2.1V6.3Z" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="oauth-name">Conectar Twitch (após login)</span>
+        <i class="ti ti-chevron-right oauth-arrow" aria-hidden="true"></i>
+      </button>
+
+      <p class="footer-note">
+        Esqueceu a senha? <a href="#">Recuperar acesso</a>
+      </p>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="panel" id="panel-register">
+      <div class="field">
+        <label for="reg-user">Nome de usuário</label>
+        <input type="text" id="reg-user" placeholder="seunome" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label for="reg-email">E-mail</label>
+        <input type="email" id="reg-email" placeholder="seu@email.com" autocomplete="email" />
+      </div>
+      <div class="field">
+        <label for="reg-pass">Senha</label>
+        <div class="pass-wrap">
+          <input type="password" id="reg-pass" placeholder="Mínimo 8 caracteres" autocomplete="new-password" />
+          <button class="pass-toggle" onclick="togglePass('reg-pass', this)" aria-label="Mostrar senha">
+            <i class="ti ti-eye"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="terms-row">
+        <input type="checkbox" id="terms" />
+        <label for="terms">
+          Concordo com os <a href="#">Termos de Uso</a> e a <a href="#">Política de Privacidade</a>
+        </label>
+      </div>
+
+      <button class="btn-primary" onclick="handleRegister()">Criar conta</button>
+
+      <div class="divider">
+        <div class="divider-line"></div>
+        <span class="divider-text">ou cadastre-se com</span>
+        <div class="divider-line"></div>
+      </div>
+
+      <button class="oauth-btn" onclick="handleOAuth('youtube')">
+        <div class="oauth-icon yt-icon">
+          <svg width="18" height="13" viewBox="0 0 20 14" fill="none" aria-hidden="true">
+            <path d="M19.582 2.186A2.507 2.507 0 0 0 17.824.42C16.27 0 10 0 10 0S3.73 0 2.176.42A2.507 2.507 0 0 0 .418 2.186 26.28 26.28 0 0 0 0 7a26.28 26.28 0 0 0 .418 4.814 2.507 2.507 0 0 0 1.758 1.766C3.73 14 10 14 10 14s6.27 0 7.824-.42a2.507 2.507 0 0 0 1.758-1.766A26.28 26.28 0 0 0 20 7a26.28 26.28 0 0 0-.418-4.814Z" fill="#fff"/>
+            <path d="M8 10l5.333-3L8 4v6Z" fill="#ff0000"/>
+          </svg>
+        </div>
+        <span class="oauth-name">Conectar YouTube (após criar conta)</span>
+        <i class="ti ti-chevron-right oauth-arrow" aria-hidden="true"></i>
+      </button>
+
+      <button class="oauth-btn" onclick="handleOAuth('twitch')">
+        <div class="oauth-icon tw-icon">
+          <svg width="16" height="16" viewBox="0 0 24 28" fill="none" aria-hidden="true">
+            <path d="M2.1 0L0 5.6V24.5h6.3V28h3.5l3.5-3.5h5.25l7-7V0H2.1ZM21 16.1l-4.2 4.2H11.9L8.4 23.8v-3.5H3.5V2.1h17.5V16.1Z" fill="#fff"/>
+            <path d="M9.8 6.3H11.9v6.3H9.8V6.3ZM15.05 6.3h2.1v6.3h-2.1V6.3Z" fill="#fff"/>
+          </svg>
+        </div>
+        <span class="oauth-name">Conectar Twitch (após criar conta)</span>
+        <i class="ti ti-chevron-right oauth-arrow" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function switchTab(tab) {
+      document.querySelectorAll('.tab').forEach((t, i) => {
+        t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'register' && i === 1));
+      });
+      document.getElementById('panel-login').classList.toggle('active', tab === 'login');
+      document.getElementById('panel-register').classList.toggle('active', tab === 'register');
+    }
+
+    function togglePass(id, btn) {
+      const inp = document.getElementById(id);
+      const showing = inp.type === 'text';
+      inp.type = showing ? 'password' : 'text';
+      btn.innerHTML = showing
+        ? '<i class="ti ti-eye"></i>'
+        : '<i class="ti ti-eye-off"></i>';
+    }
+
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 2600);
+    }
+
+    async function handleEmailLogin() {
+      const email = document.getElementById('login-email').value.trim();
+      const pass  = document.getElementById('login-pass').value;
+      if (!email || !pass) { showToast('Preencha e-mail e senha.'); return; }
+      const btn = document.querySelector('#panel-login .btn-primary');
+      btn.disabled = true;
+      btn.textContent = 'Entrando...';
+      try {
+        const res = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password: pass })
+        });
+        
+        let data;
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          console.error('[Parse Error]', jsonErr, 'Response:', res);
+          throw new Error('Resposta do servidor inválida. Tente novamente.');
+        }
+        
+        if (!res.ok) throw new Error(data.error || `Erro HTTP ${res.status}`);
+        showToast('Acesso liberado! Redirecionando...');
+        setTimeout(() => { window.location.href = '/dashboard.html'; }, 800);
+      } catch (err) {
+        showToast(err.message);
+        btn.disabled = false;
+        btn.textContent = 'Entrar';
+      }
+    }
+
+    async function handleRegister() {
+      const user  = document.getElementById('reg-user').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const pass  = document.getElementById('reg-pass').value;
+      const terms = document.getElementById('terms').checked;
+      if (!user || !email || !pass) { showToast('Preencha todos os campos.'); return; }
+      if (pass.length < 8)          { showToast('Senha muito curta (mín. 8 caracteres).'); return; }
+      if (!terms)                   { showToast('Aceite os termos para continuar.'); return; }
+      const btn = document.querySelector('#panel-register .btn-primary');
+      btn.disabled = true;
+      btn.textContent = 'Criando conta...';
+      try {
+        const res = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ creatorName: user, email, password: pass })
+        });
+        
+        let data;
+        try {
+          data = await res.json();
+        } catch (jsonErr) {
+          console.error('[Parse Error]', jsonErr, 'Response:', res);
+          throw new Error('Resposta do servidor inválida. Tente novamente.');
+        }
+        
+        if (!res.ok) throw new Error(data.error || `Erro HTTP ${res.status}`);
+        showToast('Conta criada! Redirecionando...');
+        setTimeout(() => { window.location.href = '/dashboard.html'; }, 800);
+      } catch (err) {
+        showToast(err.message);
+        btn.disabled = false;
+        btn.textContent = 'Criar conta';
+      }
+    }
+
+    function handleOAuth(platform) {
+      // Verifica se já tem sessão ativa antes de redirecionar
+      fetch('/api/auth/me').then(r => {
+        if (r.ok) {
+          window.location.href = '/auth/' + platform;
+        } else {
+          showToast('Entre ou crie uma conta primeiro. Depois conecte o ' + (platform === 'youtube' ? 'YouTube' : 'Twitch') + ' no painel.');
+        }
+      }).catch(() => {
+        showToast('Servidor indisponível. Tente novamente.');
+      });
+    }
+
+    // Abre aba correta via ?tab=signup ou ?tab=login
+    const params = new URLSearchParams(location.search);
+    if (params.get('tab') === 'signup') switchTab('register');
+
+    // Mensagens vindas do servidor via query string
+    if (params.get('auth') === 'login_required') {
+      showToast('Entre para acessar o painel.');
+    }
+    if (params.get('oauth_error')) {
+      showToast(decodeURIComponent(params.get('oauth_error')));
+    }
+
+    // Redireciona quem já está logado
+    fetch('/api/auth/me').then(r => {
+      if (r.ok) window.location.href = '/dashboard.html';
+    }).catch(() => {});
+  </script>
+</body>
+</html>

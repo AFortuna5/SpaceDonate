@@ -686,8 +686,8 @@
         <a href="/overlay.html?test=true">Testar overlay</a>
       </nav>
       <div class="nav-actions">
-        <button class="btn ghost" data-auth="login">Login</button>
-        <button class="btn primary" data-auth="signup">Criar conta</button>
+        <a class="btn ghost" href="/login.html">Login</a>
+        <a class="btn primary" href="/login.html?tab=signup">Criar conta</a>
       </div>
     </div>
   </header>
@@ -701,7 +701,7 @@
           SpaceDonate junta pagina de apoio, Pix, overlay animado, leitura de mensagens e conexao com os canais onde sua comunidade ja esta assistindo.
         </p>
         <div class="hero-actions">
-          <button class="btn primary" data-auth="signup">Comecar agora</button>
+          <a class="btn primary" href="/login.html?tab=signup">Comecar agora</a>
           <a class="btn" href="/donate.html">Ver pagina de donate</a>
           <a class="btn ghost" href="/overlay.html?test=true">Preview do overlay</a>
         </div>
@@ -737,68 +737,47 @@
       <aside class="auth-card" id="acesso" aria-label="Acesso SpaceDonate">
         <div class="auth-head">
           <div>
-            <h2 id="authTitle">Crie sua conta</h2>
+            <h2>Crie sua conta</h2>
             <p>Configure seu perfil, conecte seus canais e publique sua pagina de donate.</p>
           </div>
         </div>
 
-        <div class="tabs" role="tablist">
-          <button class="tab active" type="button" data-mode="signup">Criar conta</button>
-          <button class="tab" type="button" data-mode="login">Login</button>
-        </div>
-
-        <form class="auth-form" id="signupForm">
-          <div class="field">
-            <label for="creatorName">Nome do canal</label>
-            <input id="creatorName" name="creatorName" placeholder="SeuCanal" required>
-          </div>
-          <div class="field">
-            <label for="signupEmail">E-mail</label>
-            <input id="signupEmail" name="email" type="email" placeholder="voce@email.com" required>
-          </div>
-          <div class="field">
-            <label for="signupPassword">Senha</label>
-            <input id="signupPassword" name="password" type="password" placeholder="8 caracteres ou mais" required>
-          </div>
-          <button class="btn primary full" type="submit">Criar painel</button>
-        </form>
-
-        <form class="auth-form hidden" id="loginForm">
-          <div class="field">
-            <label for="loginEmail">E-mail</label>
-            <input id="loginEmail" name="email" type="email" placeholder="voce@email.com" required>
-          </div>
-          <div class="field">
-            <label for="loginPassword">Senha</label>
-            <input id="loginPassword" name="password" type="password" placeholder="sua senha" required>
-          </div>
-          <button class="btn primary full" type="submit">Entrar</button>
-        </form>
-
-        <div class="connect-panel">
-          <div class="connect-title">
-            <strong>Conectar canais</strong>
+        <div class="connect-panel" style="margin-top:0; padding-top:0; border-top:none;">
+          <div class="connect-title" style="margin-bottom:16px;">
+            <strong>Entrar com plataforma</strong>
             <span>OAuth oficial</span>
           </div>
           <div class="connect-grid">
-            <button class="connect" type="button" data-platform="youtube">
+            <a class="connect" href="/auth/youtube" data-platform="youtube">
               <i aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                   <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z"/>
                 </svg>
               </i>
-            <span><strong>YouTube</strong><span>Autorizar conta</span></span>
-            </button>
-            <button class="connect" type="button" data-platform="twitch">
+              <span><strong>YouTube</strong><span>Autorizar conta</span></span>
+            </a>
+            <a class="connect" href="/auth/twitch" data-platform="twitch">
               <i aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
                   <path d="M4.4 2 3 5.8v14h4.8V22h2.7l2.2-2.2h3.6L21 15.1V2H4.4Zm14.3 12-2.7 2.7h-4.1l-2.2 2.2v-2.2H6.2V4.3h12.5V14Zm-2.2-6.3v4.9h-2.2V7.7h2.2Zm-5.8 0v4.9H8.5V7.7h2.2Z"/>
                 </svg>
               </i>
-            <span><strong>Twitch</strong><span>Autorizar conta</span></span>
-            </button>
+              <span><strong>Twitch</strong><span>Autorizar conta</span></span>
+            </a>
           </div>
-          <div class="notice" id="authNotice" role="status" aria-live="polite">Use os botoes para abrir a autorizacao oficial de cada plataforma.</div>
+
+          <div style="display:flex; align-items:center; gap:10px; margin: 18px 0;">
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+            <span style="color:var(--muted); font-size:0.8rem;">ou acesse com e-mail</span>
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+          </div>
+
+          <div style="display:grid; gap:10px;">
+            <a class="btn primary full" href="/login.html?tab=signup">Criar conta com e-mail</a>
+            <a class="btn full" href="/login.html">Ja tenho conta — Entrar</a>
+          </div>
+
+          <div class="notice" id="authNotice" role="status" aria-live="polite"></div>
         </div>
       </aside>
     </section>
@@ -838,7 +817,7 @@
           <h2>Pronto para testar com sua live?</h2>
           <p>A home ja conversa com as paginas locais de donate e overlay do seu projeto.</p>
         </div>
-        <button class="btn primary" data-auth="signup">Criar conta gratis</button>
+        <a class="btn primary" href="/login.html?tab=signup">Criar conta gratis</a>
       </div>
     </section>
   </main>
@@ -851,67 +830,61 @@
   </footer>
 
   <script>
-    const tabs = document.querySelectorAll('.tab')
-    const signupForm = document.getElementById('signupForm')
-    const loginForm = document.getElementById('loginForm')
-    const authTitle = document.getElementById('authTitle')
     const notice = document.getElementById('authNotice')
 
-    function setMode(mode) {
-      tabs.forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode))
-      signupForm.classList.toggle('hidden', mode !== 'signup')
-      loginForm.classList.toggle('hidden', mode !== 'login')
-      authTitle.textContent = mode === 'signup' ? 'Crie sua conta' : 'Entre no painel'
-      document.getElementById('acesso').scrollIntoView({ behavior: 'smooth', block: 'center' })
-    }
-
-    tabs.forEach(tab => tab.addEventListener('click', () => setMode(tab.dataset.mode)))
-    document.querySelectorAll('[data-auth]').forEach(btn => {
-      btn.addEventListener('click', () => setMode(btn.dataset.auth === 'login' ? 'login' : 'signup'))
-    })
-
-    document.querySelectorAll('.auth-form').forEach(form => {
-      form.addEventListener('submit', event => {
-        event.preventDefault()
-        const isSignup = form.id === 'signupForm'
-        notice.textContent = isSignup
-          ? 'Conta criada em modo demonstracao. Proximo passo: conectar um canal.'
-          : 'Login demonstrativo concluido. Backend real pode ser ligado depois.'
-      })
-    })
-
-    async function loadConnectionStatus() {
+    // Detecta se já está logado e atualiza a nav
+    async function loadAuthStatus() {
       try {
-        const res = await fetch('/api/connections')
-        const data = await res.json()
-        document.querySelectorAll('.connect').forEach(button => {
-          const info = data[button.dataset.platform]
-          if (!info?.connected) return
-          button.classList.add('connected')
-          button.querySelector('span span').textContent = info.displayName || 'Conectado'
+        const res = await fetch('/api/auth/me')
+        if (!res.ok) return
+        const { user } = await res.json()
+        if (notice) notice.textContent = 'Você está logado como ' + user.creatorName + '.'
+        document.querySelector('.nav-actions').innerHTML =
+          '<a class="btn ghost" href="/dashboard.html">Painel</a>' +
+          '<button class="btn primary" id="logoutHome" type="button">Sair</button>'
+        document.getElementById('logoutHome').addEventListener('click', async () => {
+          await fetch('/api/auth/logout', { method: 'POST' })
+          window.location.reload()
         })
+        // Só busca conexões se estiver logado
+        loadConnectionStatus()
       } catch {
-        // The static page still works when opened without the Node server.
+        // Página funciona sem servidor (abertura estática)
       }
     }
 
-    document.querySelectorAll('.connect').forEach(button => {
-      button.addEventListener('click', () => {
-        window.location.href = '/auth/' + button.dataset.platform
-      })
-    })
+    // Atualiza status de conexão dos botões OAuth no card
+    async function loadConnectionStatus() {
+      try {
+        const res = await fetch('/api/connections')
+        if (!res.ok) return
+        const data = await res.json()
+        document.querySelectorAll('.connect[data-platform]').forEach(el => {
+          const info = data[el.dataset.platform]
+          if (!info?.connected) return
+          el.classList.add('connected')
+          const sub = el.querySelector('span span')
+          if (sub) sub.textContent = info.displayName || 'Conectado'
+        })
+      } catch {
+        // Silencioso
+      }
+    }
 
+    // Trata query strings vindas do servidor
     const params = new URLSearchParams(location.search)
-    if (params.get('connected')) {
+    if (params.get('connected') && notice) {
       const platform = params.get('connected') === 'youtube' ? 'YouTube' : 'Twitch'
       notice.textContent = platform + ' conectado com sucesso.'
       history.replaceState(null, '', location.pathname + location.hash)
-    } else if (params.get('oauth_error')) {
+    } else if (params.get('auth') === 'login_required') {
+      window.location.href = '/login.html'
+    } else if (params.get('oauth_error') && notice) {
       notice.textContent = params.get('oauth_error')
       history.replaceState(null, '', location.pathname + location.hash)
     }
 
-    loadConnectionStatus()
+    loadAuthStatus()
   </script>
 </body>
 </html>

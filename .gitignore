@@ -1,4 +1,6 @@
 .env
+.data/
 .oauth-connections.json
 payment-server.*.log
+node-server.*.log
 node_modules/

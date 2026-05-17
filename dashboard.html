@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpaceDonate - Painel</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070807;
+      --panel: #0e100d;
+      --panel2: #141812;
+      --line: #27301f;
+      --text: #f2f4ec;
+      --muted: #878b7d;
+      --accent: #c8ff00;
+      --cyan: #5ce1e6;
+      --red: #ff4b4b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100dvh;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(200,255,0,0.12), transparent 25%),
+        linear-gradient(180deg, #090a08, var(--bg));
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button { font: inherit; }
+
+    .wrap {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    header {
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(7,8,7,0.78);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav {
+      min-height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+    }
+
+    .mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      background: var(--accent);
+      color: #080a06;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: end;
+    }
+
+    .btn {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      background: #0a0b09;
+      color: var(--text);
+      padding: 0 15px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #080a06;
+      font-weight: 700;
+    }
+
+    main { padding: 48px 0 80px; }
+
+    .hero {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.4rem, 5vw, 4.8rem);
+      line-height: 0.94;
+      max-width: 760px;
+    }
+
+    .hero p {
+      margin-top: 14px;
+      color: var(--muted);
+      line-height: 1.65;
+      max-width: 560px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 14px;
+    }
+
+    .panel {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.015)), var(--panel);
+      padding: 22px;
+    }
+
+    .panel h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+      margin-bottom: 16px;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .card {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: var(--panel2);
+      padding: 18px;
+      min-height: 120px;
+    }
+
+    .card span {
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .card strong {
+      display: block;
+      margin-top: 12px;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.25rem;
+    }
+
+    .links {
+      display: grid;
+      gap: 10px;
+    }
+
+    .link-row {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #090a08;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .link-row small {
+      display: block;
+      color: var(--muted);
+      margin-top: 5px;
+      overflow-wrap: anywhere;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .stack {
+      display: grid;
+      gap: 14px;
+    }
+
+    .profile-line {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 11px 0;
+    }
+
+    .profile-line span { color: var(--muted); }
+    .profile-line strong { text-align: right; overflow-wrap: anywhere; }
+
+    .connection-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .connection {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #090a08;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 34px 1fr auto;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .connection i {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: white;
+      font-style: normal;
+    }
+
+    .connection svg {
+      width: 20px;
+      height: 20px;
+      fill: currentColor;
+    }
+
+    .connection[data-platform="youtube"] i { background: #ff0033; }
+    .connection[data-platform="twitch"] i { background: #9146ff; }
+
+    .connection small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+    }
+
+    .connection.connected {
+      border-color: rgba(200,255,0,0.45);
+      background: rgba(200,255,0,0.04);
+    }
+
+    @media (max-width: 860px) {
+      .hero, .nav { align-items: start; flex-direction: column; }
+      .grid, .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="/">
+        <span class="mark">SD</span>
+        <span>SpaceDonate</span>
+      </a>
+      <div class="actions">
+        <a class="btn" href="/donate.html">Donate</a>
+        <a class="btn" href="/overlay.html?test=true">Overlay teste</a>
+        <button class="btn" id="logoutButton" type="button">Sair</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <div class="status">Painel autenticado</div>
+        <h1 id="title">Carregando painel...</h1>
+        <p>Gerencie seus links locais, teste alertas e acompanhe a base da conta do streamer.</p>
+      </div>
+      <a class="btn primary" href="/donate.html">Abrir pagina publica</a>
+    </section>
+
+    <section class="grid">
+      <div class="stack">
+        <div class="panel">
+          <h2>Resumo</h2>
+          <div class="cards">
+            <div class="card"><span>Donates hoje</span><strong>R$ 0,00</strong></div>
+            <div class="card"><span>Alertas enviados</span><strong>0</strong></div>
+            <div class="card"><span>Status Pix</span><strong>Placeholder</strong></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Links</h2>
+          <div class="links">
+            <div class="link-row">
+              <div><strong>Pagina de donate</strong><small id="donateUrl"></small></div>
+              <a class="btn" href="/donate.html">Abrir</a>
+            </div>
+            <div class="link-row">
+              <div><strong>Overlay OBS</strong><small id="overlayUrl"></small></div>
+              <a class="btn" href="/overlay.html?test=true">Testar</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="panel">
+        <h2>Conta</h2>
+        <div class="profile-line"><span>Canal</span><strong id="creatorName">...</strong></div>
+        <div class="profile-line"><span>E-mail</span><strong id="email">...</strong></div>
+        <div class="profile-line"><span>Criada em</span><strong id="createdAt">...</strong></div>
+      </aside>
+
+      <aside class="panel">
+        <h2>Plataformas</h2>
+        <div class="connection-list">
+          <div class="connection" data-platform="youtube">
+            <i aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z"/></svg>
+            </i>
+            <div><strong>YouTube</strong><small>Não conectado</small></div>
+            <a class="btn" href="/auth/youtube">Conectar</a>
+          </div>
+          <div class="connection" data-platform="twitch">
+            <i aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false"><path d="M4.4 2 3 5.8v14h4.8V22h2.7l2.2-2.2h3.6L21 15.1V2H4.4Zm14.3 12-2.7 2.7h-4.1l-2.2 2.2v-2.2H6.2V4.3h12.5V14Zm-2.2-6.3v4.9h-2.2V7.7h2.2Zm-5.8 0v4.9H8.5V7.7h2.2Z"/></svg>
+            </i>
+            <div><strong>Twitch</strong><small>Não conectado</small></div>
+            <a class="btn" href="/auth/twitch">Conectar</a>
+          </div>
+        </div>
+      </aside>
+    </section>
+  </main>
+
+  <script>
+    async function loadUser() {
+      const res = await fetch('/api/auth/me')
+      if (!res.ok) {
+        window.location.href = '/login.html?auth=login_required'
+        return
+      }
+      const { user } = await res.json()
+      document.getElementById('title').textContent = 'Bem-vindo, ' + user.creatorName
+      document.getElementById('creatorName').textContent = user.creatorName
+      document.getElementById('email').textContent = user.email
+      document.getElementById('createdAt').textContent = new Date(user.createdAt).toLocaleDateString('pt-BR')
+    }
+
+    async function loadConnections() {
+      const params = new URLSearchParams(location.search)
+      if (params.get('connected')) history.replaceState(null, '', location.pathname)
+
+      const res = await fetch('/api/connections')
+      if (!res.ok) return
+      const data = await res.json()
+      document.querySelectorAll('.connection').forEach(card => {
+        const platform = card.dataset.platform
+        const info = data[platform]
+        if (!info?.connected) return
+        card.classList.add('connected')
+        card.querySelector('small').textContent = info.displayName || 'Conectado'
+        card.querySelector('.btn').textContent = 'Reconectar'
+      })
+    }
+
+    document.getElementById('donateUrl').textContent = location.origin + '/donate.html'
+    document.getElementById('overlayUrl').textContent = location.origin + '/overlay.html'
+
+    document.getElementById('logoutButton').addEventListener('click', async () => {
+      await fetch('/api/auth/logout', { method: 'POST' })
+      window.location.href = '/'
+    })
+
+    loadUser()
+    loadConnections()
+  </script>
+</body>
+</html>
