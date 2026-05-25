@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SpaceDonate — Overlay OBS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Outfit:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; height: 100%;
+    background: transparent;
+    overflow: hidden;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* ── Alert container (bottom-left OBS corner) ─────────────── */
+  #alert-container {
+    position: fixed;
+    bottom: 48px;
+    left: 48px;
+    width: 500px;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* ── Card ─────────────────────────────────────────────────── */
+  .alert-card {
+    background: rgba(8, 8, 8, 0.97);
+    border: 1px solid rgba(200, 255, 0, 0.25);
+    border-left: 3px solid #c8ff00;
+    padding: 20px 22px;
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 18px;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+
+    /* Start hidden */
+    opacity: 0;
+    transform: translateX(-24px);
+    transition:
+      opacity  0.38s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.38s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* Subtle scanline texture */
+  .alert-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(255,255,255,0.012) 2px,
+      rgba(255,255,255,0.012) 4px
+    );
+    pointer-events: none;
+  }
+
+  /* Shine sweep on enter */
+  .alert-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(200,255,0,0.06), transparent);
+    transition: left 0.6s ease;
+  }
+
+  .alert-card.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+
+  .alert-card.visible::after { left: 160%; }
+
+  .alert-card.hiding {
+    opacity: 0;
+    transform: translateX(-12px) scale(0.98);
+    transition: opacity 0.28s ease, transform 0.28s ease;
+  }
+
+  /* ── Avatar ───────────────────────────────────────────────── */
+  .alert-avatar {
+    width: 48px; height: 48px;
+    border: 1px solid rgba(200,255,0,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.35rem;
+    flex-shrink: 0;
+    background: rgba(200,255,0,0.06);
+    position: relative;
+  }
+
+  .alert-avatar::after {
+    content: '';
+    position: absolute;
+    inset: -4px;
+    border: 1px solid rgba(200,255,0,0.12);
+  }
+
+  /* ── Body ─────────────────────────────────────────────────── */
+  .alert-body { min-width: 0; }
+
+  .alert-top {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 5px;
+    flex-wrap: wrap;
+  }
+
+  .alert-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #f0f0f0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+  }
+
+  .alert-verb {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    color: #4a4a4a;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+  }
+
+  .alert-amount {
+    font-family: 'DM Mono', monospace;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #c8ff00;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-shadow: 0 0 24px rgba(200,255,0,0.5);
+    margin-left: auto;
+  }
+
+  .alert-message {
+    font-size: 0.84rem;
+    color: #555;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── Progress bar ─────────────────────────────────────────── */
+  .progress-track {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 2px;
+    background: rgba(200,255,0,0.08);
+  }
+
+  .progress-fill {
+    height: 100%;
+    background: #c8ff00;
+    width: 100%;
+    transform-origin: left;
+    will-change: transform;
+    box-shadow: 0 0 8px rgba(200,255,0,0.6);
+  }
+
+  /* ── Status indicator (dev mode) ─────────────────────────── */
+  #status {
+    position: fixed;
+    top: 16px; right: 16px;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.65rem;
+    color: rgba(255,255,255,0.3);
+    background: rgba(8,8,8,0.7);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 5px 12px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    letter-spacing: 0.05em;
+  }
+
+  .status-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: #333;
+    transition: background 0.3s;
+  }
+  .status-dot.connected { background: #c8ff00; box-shadow: 0 0 6px #c8ff00; }
+  .status-dot.error     { background: #ff4d4d; }
+
+  /* ── Particles ────────────────────────────────────────────── */
+  @keyframes particle-fly {
+    0%   { transform: translate(0, 0) scale(1); opacity: 1; }
+    100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity: 0; }
+  }
+
+  .particle {
+    position: absolute;
+    width: 4px; height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
+    animation: particle-fly 0.55s ease-out forwards;
+  }
+
+  /* ── Corner marks ─────────────────────────────────────────── */
+  .corner {
+    position: absolute;
+    width: 8px; height: 8px;
+    border-color: rgba(200,255,0,0.4);
+    border-style: solid;
+  }
+  .corner-tl { top: 6px; left: 6px;  border-width: 1px 0 0 1px; }
+  .corner-tr { top: 6px; right: 6px; border-width: 1px 1px 0 0; }
+  .corner-bl { bottom: 6px; left: 6px;  border-width: 0 0 1px 1px; }
+  .corner-br { bottom: 6px; right: 6px; border-width: 0 1px 1px 0; }
+</style>
+</head>
+<body>
+
+<!-- Dev status pill -->
+<div id="status">
+  <div class="status-dot" id="statusDot"></div>
+  <span id="statusText">conectando</span>
+</div>
+
+<!-- Alerts injected here -->
+<div id="alert-container"></div>
+
+<script>
+  // ══════════════════════════════════════════════════════════
+  // CONFIG
+  // ══════════════════════════════════════════════════════════
+  const DISPLAY_MS = 7000
+  const HIDE_MS    = 320
+
+  // ══════════════════════════════════════════════════════════
+  // QUEUE
+  // ══════════════════════════════════════════════════════════
+  const queue = []
+  let busy = false
+
+  function enqueue(d) {
+    queue.push(d)
+    if (!busy) next()
+  }
+
+  function next() {
+    if (!queue.length) { busy = false; return }
+    busy = true
+    show(queue.shift())
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // SHOW ALERT
+  // ══════════════════════════════════════════════════════════
+  function show(donation) {
+    const container = document.getElementById('alert-container')
+    const cents = donation.amount
+    const reais = (cents / 100).toFixed(2).replace('.', ',')
+    const emoji = pickEmoji(cents / 100)
+
+    const card = document.createElement('div')
+    card.className = 'alert-card'
+    card.innerHTML = `
+      <div class="corner corner-tl"></div>
+      <div class="corner corner-tr"></div>
+      <div class="corner corner-bl"></div>
+      <div class="corner corner-br"></div>
+      <div class="alert-avatar">${emoji}</div>
+      <div class="alert-body">
+        <div class="alert-top">
+          <span class="alert-name">${esc(donation.name)}</span>
+          <span class="alert-verb">doou</span>
+          <span class="alert-amount">R$&nbsp;${reais}</span>
+        </div>
+        ${donation.message
+          ? `<div class="alert-message">${esc(donation.message)}</div>`
+          : ''}
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="pf-${Date.now()}"></div>
+      </div>
+    `
+
+    container.appendChild(card)
+
+    // Double rAF so transition fires
+    requestAnimationFrame(() => requestAnimationFrame(() => {
+      card.classList.add('visible')
+      animateProgress(card)
+      particles(card)
+      speak(donation)
+    }))
+
+    setTimeout(() => hide(card), DISPLAY_MS)
+  }
+
+  function hide(card) {
+    card.classList.remove('visible')
+    card.classList.add('hiding')
+    setTimeout(() => {
+      card.remove()
+      setTimeout(next, 120)
+    }, HIDE_MS)
+  }
+
+  function animateProgress(card) {
+    const fill = card.querySelector('.progress-fill')
+    if (!fill) return
+    fill.style.transition = `transform ${DISPLAY_MS}ms linear`
+    requestAnimationFrame(() => { fill.style.transform = 'scaleX(0)' })
+  }
+
+  function particles(card) {
+    const colors = ['#c8ff00', '#ffffff', '#a0ff00', '#e0ff80']
+    for (let i = 0; i < 10; i++) {
+      const p = document.createElement('div')
+      p.className = 'particle'
+      p.style.left = (Math.random() * 90 + 5) + '%'
+      p.style.top  = (Math.random() * 80 + 10) + '%'
+      p.style.setProperty('--dx', (Math.random() - 0.5) * 50 + 'px')
+      p.style.setProperty('--dy', (Math.random() - 0.5) * 40 + 'px')
+      p.style.background = colors[i % colors.length]
+      p.style.animationDelay = (Math.random() * 0.15) + 's'
+      card.appendChild(p)
+      p.addEventListener('animationend', () => p.remove())
+    }
+  }
+
+  function pickEmoji(r) {
+    if (r >= 100) return '🔥'
+    if (r >= 50)  return '💎'
+    if (r >= 20)  return '⭐'
+    if (r >= 10)  return '🟢'
+    return '🎮'
+  }
+
+  function esc(s) {
+    return String(s)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // TTS
+  // ══════════════════════════════════════════════════════════
+  let voices = []
+  speechSynthesis.onvoiceschanged = () => { voices = speechSynthesis.getVoices() }
+  voices = speechSynthesis.getVoices()
+
+  function speak(donation) {
+    if (!('speechSynthesis' in window)) return
+    speechSynthesis.cancel()
+    const r = Math.round(donation.amount / 100)
+    const txt = donation.message
+      ? `${donation.name} doou ${r} reais e disse: ${donation.message}`
+      : `${donation.name} fez um donate de ${r} reais!`
+    const u = new SpeechSynthesisUtterance(txt)
+    const pt = voices.find(v => v.lang.startsWith('pt'))
+    if (pt) u.voice = pt
+    u.rate = 1.05
+    speechSynthesis.speak(u)
+  }
+
+  // ══════════════════════════════════════════════════════════
+  // SSE
+  // ══════════════════════════════════════════════════════════
+  const dot  = document.getElementById('statusDot')
+  const txt  = document.getElementById('statusText')
+  let once = false
+
+  function connect() {
+    const es = new EventSource('/api/alerts/stream')
+
+    es.onopen = () => {
+      once = true
+      dot.className = 'status-dot connected'
+      txt.textContent = 'conectado'
+    }
+
+    es.onmessage = (e) => {
+      const d = JSON.parse(e.data)
+      if (d.type === 'connected') {
+        dot.className = 'status-dot connected'
+        txt.textContent = 'placeholder'
+      }
+      if (d.type === 'donation' || d.type === 'test') enqueue(d)
+    }
+
+    es.onerror = () => {
+      es.close()
+      if (once) { dot.className = 'status-dot connected'; txt.textContent = 'placeholder'; return }
+      dot.className = 'status-dot error'
+      txt.textContent = 'reconectando...'
+      setTimeout(connect, 3000)
+    }
+  }
+
+  connect()
+
+  // ══════════════════════════════════════════════════════════
+  // TEST MODE  →  overlay.html?test=true
+  // ══════════════════════════════════════════════════════════
+  const p = new URLSearchParams(location.search)
+  if (p.get('test') === 'true') {
+    setTimeout(() => enqueue({
+      type: 'test', name: 'GamerXP_BR',
+      amount: 5000, message: 'Conteúdo incrível! Continua assim gg 🔥'
+    }), 1500)
+    setTimeout(() => enqueue({
+      type: 'test', name: 'StreamFan99',
+      amount: 1000, message: ''
+    }), 10000)
+    setTimeout(() => enqueue({
+      type: 'test', name: 'TopDoador',
+      amount: 15000, message: 'Pix de 150 reais pra ver o streamer caindo 💎'
+    }), 18000)
+  }
+</script>
+</body>
+</html>

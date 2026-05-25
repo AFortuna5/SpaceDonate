@@ -1,5 +1,6 @@
 {
   "name": "spacedonate",
+<<<<<<< HEAD
   "version": "5.0.0",
   "private": true,
   "scripts": {
@@ -36,3 +37,19 @@
     "eslint": "^9.10.0"
   }
 }
+=======
+  "version": "2.0.0",
+  "private": true,
+  "description": "Página de donate com Pix para streamers — overlay OBS incluído.",
+  "scripts": {
+    "start": "node server.js",
+    "check": "node --check server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "puppeteer": "^25.0.2"
+  }
+}
+>>>>>>> 3d71c87aa8389a3a8a24bc1f6a466904ffab09a0

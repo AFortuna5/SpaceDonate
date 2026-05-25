@@ -1,0 +1,890 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpaceDonate - Donates Pix para lives</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #070807;
+      --ink: #f2f4ec;
+      --muted: #878b7d;
+      --soft: #171915;
+      --panel: #0e100d;
+      --line: #272d22;
+      --line2: #394131;
+      --acid: #c8ff00;
+      --acid2: #ecff88;
+      --cyan: #5ce1e6;
+      --pink: #ff4fd8;
+      --red: #ff4b4b;
+      --twitch: #9146ff;
+      --youtube: #ff0033;
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      min-height: 100dvh;
+      background:
+        radial-gradient(circle at 12% 16%, rgba(200,255,0,0.16), transparent 25%),
+        radial-gradient(circle at 82% 8%, rgba(92,225,230,0.12), transparent 22%),
+        linear-gradient(180deg, #090a08 0%, #070807 48%, #0d0f0c 100%);
+      color: var(--ink);
+      font-family: 'Outfit', sans-serif;
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: 0.5;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, black, transparent 78%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+
+    .wrap {
+      width: min(1180px, calc(100% - 40px));
+      margin: 0 auto;
+    }
+
+    .nav {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      background: rgba(7,8,7,0.72);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .nav-inner {
+      height: 72px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: 'Syne', sans-serif;
+      font-weight: 800;
+      letter-spacing: 0.01em;
+    }
+
+    .brand-mark {
+      width: 34px;
+      height: 34px;
+      display: grid;
+      place-items: center;
+      color: #0a0c08;
+      background: var(--acid);
+      box-shadow: 0 0 30px rgba(200,255,0,0.28);
+      font-family: 'DM Mono', monospace;
+      font-weight: 500;
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 26px;
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      min-height: 42px;
+      padding: 0 16px;
+      border: 1px solid var(--line2);
+      background: rgba(14,16,13,0.72);
+      color: var(--ink);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 9px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); border-color: var(--acid); }
+    .btn.primary { background: var(--acid); border-color: var(--acid); color: #080a06; font-weight: 700; }
+    .btn.ghost { background: transparent; }
+    .btn.full { width: 100%; }
+
+    .hero {
+      min-height: calc(100dvh - 72px);
+      display: grid;
+      grid-template-columns: minmax(0, 1.04fr) 430px;
+      gap: 44px;
+      align-items: center;
+      padding: 54px 0 72px;
+    }
+
+    .eyebrow {
+      width: fit-content;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 12px;
+      border: 1px solid rgba(200,255,0,0.25);
+      background: rgba(200,255,0,0.06);
+      color: var(--acid2);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .eyebrow::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: var(--acid);
+      box-shadow: 0 0 12px var(--acid);
+    }
+
+    h1 {
+      margin-top: 26px;
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(3.1rem, 7vw, 6.6rem);
+      line-height: 0.9;
+      letter-spacing: -0.02em;
+      max-width: 760px;
+    }
+
+    h1 span { color: var(--acid); display: block; }
+
+    .lead {
+      margin-top: 24px;
+      max-width: 630px;
+      color: #b6baa9;
+      line-height: 1.75;
+      font-size: 1.05rem;
+    }
+
+    .hero-actions {
+      margin-top: 32px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .trust-row {
+      margin-top: 44px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      max-width: 680px;
+    }
+
+    .metric {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.035);
+      padding: 18px;
+    }
+
+    .metric strong {
+      display: block;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.35rem;
+      color: var(--ink);
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .auth-card {
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.015)),
+        var(--panel);
+      border: 1px solid rgba(255,255,255,0.1);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 3px;
+      background: linear-gradient(90deg, var(--acid), var(--cyan), var(--pink));
+    }
+
+    .auth-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      margin-bottom: 18px;
+    }
+
+    .auth-head h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.45rem;
+      line-height: 1;
+    }
+
+    .auth-head p {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid var(--line);
+      margin-bottom: 16px;
+    }
+
+    .tab {
+      height: 42px;
+      border: 0;
+      background: transparent;
+      color: var(--muted);
+      cursor: pointer;
+    }
+
+    .tab.active {
+      background: rgba(200,255,0,0.1);
+      color: var(--acid);
+    }
+
+    .auth-form { display: grid; gap: 12px; }
+    .auth-form.hidden { display: none; }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .field input {
+      width: 100%;
+      height: 46px;
+      border: 1px solid var(--line2);
+      background: #080908;
+      color: var(--ink);
+      padding: 0 13px;
+      outline: none;
+    }
+
+    .field input:focus {
+      border-color: var(--acid);
+      box-shadow: 0 0 0 3px rgba(200,255,0,0.1);
+    }
+
+    .connect-panel {
+      margin-top: 18px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .connect-title {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 0.84rem;
+      margin-bottom: 12px;
+    }
+
+    .connect-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    .connect {
+      min-height: 58px;
+      border: 1px solid var(--line2);
+      background: #0a0b09;
+      color: var(--ink);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 13px;
+    }
+
+    .connect strong { display: block; }
+    .connect span { display: block; margin-top: 3px; color: var(--muted); font-size: 0.74rem; }
+    .connect[data-platform="youtube"] i { background: var(--youtube); }
+    .connect[data-platform="twitch"] i { background: var(--twitch); }
+
+    .connect i {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      font-style: normal;
+      color: white;
+    }
+
+    .connect i svg {
+      width: 19px;
+      height: 19px;
+      display: block;
+      fill: currentColor;
+    }
+
+    .connect.connected {
+      border-color: rgba(200,255,0,0.65);
+      background: rgba(200,255,0,0.06);
+    }
+
+    .connect.connected span { color: var(--acid); }
+
+    .notice {
+      min-height: 18px;
+      margin-top: 12px;
+      color: var(--acid2);
+      font-size: 0.82rem;
+    }
+
+    .product-shot {
+      margin-top: 32px;
+      border: 1px solid rgba(255,255,255,0.1);
+      background: #0b0c0a;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .shot-top {
+      height: 46px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+    }
+
+    .dots { display: flex; gap: 7px; }
+    .dots b { width: 9px; height: 9px; background: var(--line2); display: block; }
+    .dots b:nth-child(1) { background: var(--red); }
+    .dots b:nth-child(2) { background: #ffcc00; }
+    .dots b:nth-child(3) { background: var(--acid); }
+
+    .shot-body {
+      display: grid;
+      grid-template-columns: 1fr 250px;
+      gap: 18px;
+      padding: 18px;
+    }
+
+    .preview-stream {
+      min-height: 280px;
+      background:
+        linear-gradient(120deg, rgba(200,255,0,0.08), transparent 42%),
+        linear-gradient(180deg, #151713, #090a09);
+      border: 1px solid rgba(255,255,255,0.08);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-stream::before {
+      content: "LIVE";
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      background: var(--red);
+      color: white;
+      padding: 5px 9px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+    }
+
+    .avatar-visual {
+      position: absolute;
+      width: 180px;
+      height: 180px;
+      left: 50%;
+      top: 48%;
+      transform: translate(-50%, -50%);
+      background:
+        radial-gradient(circle at 50% 36%, var(--acid) 0 16%, transparent 17%),
+        radial-gradient(circle at 34% 66%, var(--cyan) 0 12%, transparent 13%),
+        radial-gradient(circle at 66% 66%, var(--pink) 0 12%, transparent 13%),
+        #20241b;
+      border: 1px solid rgba(255,255,255,0.12);
+      clip-path: polygon(50% 0, 95% 24%, 95% 76%, 50% 100%, 5% 76%, 5% 24%);
+    }
+
+    .alert-preview {
+      position: absolute;
+      left: 18px;
+      bottom: 18px;
+      right: 18px;
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 14px;
+      background: rgba(8,8,8,0.92);
+      border: 1px solid rgba(200,255,0,0.3);
+      border-left: 3px solid var(--acid);
+    }
+
+    .mini-mark {
+      width: 42px;
+      height: 42px;
+      background: rgba(200,255,0,0.12);
+      display: grid;
+      place-items: center;
+      color: var(--acid);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .alert-preview small {
+      display: block;
+      color: var(--muted);
+      margin-top: 3px;
+    }
+
+    .alert-preview strong:last-child {
+      color: var(--acid);
+      font-family: 'DM Mono', monospace;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 12px;
+    }
+
+    .side-box {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.025);
+      padding: 14px;
+    }
+
+    .side-box span {
+      color: var(--muted);
+      font-size: 0.78rem;
+    }
+
+    .side-box strong {
+      display: block;
+      margin-top: 8px;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.15rem;
+      color: var(--ink);
+    }
+
+    .meter {
+      margin-top: 12px;
+      height: 8px;
+      background: #060706;
+      overflow: hidden;
+    }
+
+    .meter div { height: 100%; background: var(--acid); }
+
+    .section {
+      padding: 86px 0;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      align-items: end;
+      margin-bottom: 28px;
+    }
+
+    .section h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2rem, 4vw, 3.6rem);
+      line-height: 1;
+      max-width: 650px;
+    }
+
+    .section-head p {
+      max-width: 370px;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .feature {
+      min-height: 210px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .feature i {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border: 1px solid rgba(200,255,0,0.35);
+      color: var(--acid);
+      font-style: normal;
+      font-family: 'DM Mono', monospace;
+    }
+
+    .feature h3 {
+      font-family: 'Syne', sans-serif;
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+    }
+
+    .feature p {
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .step {
+      border: 1px solid rgba(255,255,255,0.08);
+      padding: 22px;
+      background: #0c0e0b;
+    }
+
+    .step b {
+      color: var(--acid);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.8rem;
+    }
+
+    .step h3 {
+      margin-top: 22px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1.3rem;
+    }
+
+    .step p {
+      margin-top: 10px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .cta {
+      padding: 64px 0 80px;
+    }
+
+    .cta-box {
+      border: 1px solid rgba(200,255,0,0.24);
+      background:
+        linear-gradient(90deg, rgba(200,255,0,0.12), transparent 45%),
+        #0d100b;
+      padding: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    .cta h2 {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      line-height: 1;
+    }
+
+    .cta p {
+      margin-top: 10px;
+      color: var(--muted);
+    }
+
+    footer {
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding: 28px 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .footer-inner {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      flex-wrap: wrap;
+    }
+
+    @media (max-width: 980px) {
+      .hero { grid-template-columns: 1fr; padding-top: 36px; }
+      .auth-card { max-width: 560px; }
+      .shot-body { grid-template-columns: 1fr; }
+      .feature-grid { grid-template-columns: repeat(2, 1fr); }
+      .steps { grid-template-columns: 1fr; }
+      .section-head { display: block; }
+      .section-head p { margin-top: 14px; }
+    }
+
+    @media (max-width: 720px) {
+      .wrap { width: min(100% - 24px, 1180px); }
+      .nav-inner { height: auto; padding: 14px 0; align-items: start; }
+      .nav-links { display: none; }
+      .nav-actions { flex-wrap: wrap; justify-content: end; }
+      .hero { min-height: auto; }
+      .trust-row, .connect-grid, .feature-grid { grid-template-columns: 1fr; }
+      .product-shot { display: none; }
+      .cta-box { display: block; }
+      .cta-box .btn { margin-top: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="nav">
+    <div class="wrap nav-inner">
+      <a class="brand" href="/">
+        <span class="brand-mark">SD</span>
+        <span>SpaceDonate</span>
+      </a>
+      <nav class="nav-links" aria-label="Principal">
+        <a href="#recursos">Recursos</a>
+        <a href="#como-funciona">Como funciona</a>
+        <a href="/donate.html">Pagina de donate</a>
+        <a href="/overlay.html?test=true">Testar overlay</a>
+      </nav>
+      <div class="nav-actions">
+        <a class="btn ghost" href="/login.html">Login</a>
+        <a class="btn primary" href="/login.html?tab=signup">Criar conta</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div>
+        <div class="eyebrow">Pix, alertas e widgets para streamers</div>
+        <h1>Receba donates sem tirar a live de orbita<span>e mostre tudo no OBS.</span></h1>
+        <p class="lead">
+          SpaceDonate junta pagina de apoio, Pix, overlay animado, leitura de mensagens e conexao com os canais onde sua comunidade ja esta assistindo.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="/login.html?tab=signup">Comecar agora</a>
+          <a class="btn" href="/donate.html">Ver pagina de donate</a>
+          <a class="btn ghost" href="/overlay.html?test=true">Preview do overlay</a>
+        </div>
+        <div class="trust-row">
+          <div class="metric"><strong>2%</strong><span>taxa planejada no Pix</span></div>
+          <div class="metric"><strong>OBS</strong><span>overlay transparente pronto</span></div>
+          <div class="metric"><strong>YT + TW</strong><span>conectores para canais</span></div>
+        </div>
+
+        <div class="product-shot" aria-label="Previa do painel SpaceDonate">
+          <div class="shot-top">
+            <div class="dots"><b></b><b></b><b></b></div>
+            <span>dashboard.spacedonate.local</span>
+          </div>
+          <div class="shot-body">
+            <div class="preview-stream">
+              <div class="avatar-visual"></div>
+              <div class="alert-preview">
+                <span class="mini-mark">$</span>
+                <strong>AnaLive<small>Mandou um salve para o chat</small></strong>
+                <strong>R$ 25</strong>
+              </div>
+            </div>
+            <div class="side-stack">
+              <div class="side-box"><span>Donates hoje</span><strong>R$ 482,00</strong><div class="meter"><div style="width:72%"></div></div></div>
+              <div class="side-box"><span>Meta da live</span><strong>72%</strong><div class="meter"><div style="width:72%"></div></div></div>
+              <div class="side-box"><span>Canais</span><strong>YouTube + Twitch</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <aside class="auth-card" id="acesso" aria-label="Acesso SpaceDonate">
+        <div class="auth-head">
+          <div>
+            <h2>Crie sua conta</h2>
+            <p>Configure seu perfil, conecte seus canais e publique sua pagina de donate.</p>
+          </div>
+        </div>
+
+        <div class="connect-panel" style="margin-top:0; padding-top:0; border-top:none;">
+          <div class="connect-title" style="margin-bottom:16px;">
+            <strong>Entrar com plataforma</strong>
+            <span>OAuth oficial</span>
+          </div>
+          <div class="connect-grid">
+            <a class="connect" href="/auth/youtube" data-platform="youtube">
+              <i aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z"/>
+                </svg>
+              </i>
+              <span><strong>YouTube</strong><span>Autorizar conta</span></span>
+            </a>
+            <a class="connect" href="/auth/twitch" data-platform="twitch">
+              <i aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M4.4 2 3 5.8v14h4.8V22h2.7l2.2-2.2h3.6L21 15.1V2H4.4Zm14.3 12-2.7 2.7h-4.1l-2.2 2.2v-2.2H6.2V4.3h12.5V14Zm-2.2-6.3v4.9h-2.2V7.7h2.2Zm-5.8 0v4.9H8.5V7.7h2.2Z"/>
+                </svg>
+              </i>
+              <span><strong>Twitch</strong><span>Autorizar conta</span></span>
+            </a>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px; margin: 18px 0;">
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+            <span style="color:var(--muted); font-size:0.8rem;">ou acesse com e-mail</span>
+            <div style="flex:1; height:1px; background:rgba(255,255,255,0.08);"></div>
+          </div>
+
+          <div style="display:grid; gap:10px;">
+            <a class="btn primary full" href="/login.html?tab=signup">Criar conta com e-mail</a>
+            <a class="btn full" href="/login.html">Ja tenho conta — Entrar</a>
+          </div>
+
+          <div class="notice" id="authNotice" role="status" aria-live="polite"></div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="recursos">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Ferramentas para transformar apoio em show.</h2>
+          <p>Inspirado no que streamers usam todos os dias, com identidade propria e foco em uma configuracao rapida.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature"><i>01</i><div><h3>Pagina de donate</h3><p>Um link simples para receber apoio com valor, nome e mensagem do viewer.</p></div></article>
+          <article class="feature"><i>02</i><div><h3>Overlay OBS</h3><p>Alertas transparentes, animados e prontos para encaixar na cena da live.</p></div></article>
+          <article class="feature"><i>03</i><div><h3>Leitura de voz</h3><p>Mensagens podem virar audio no navegador para dar mais presenca ao chat.</p></div></article>
+          <article class="feature"><i>04</i><div><h3>Metas e QR code</h3><p>Mostre progresso, atalhos de pagamento e chamadas para sua comunidade.</p></div></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="como-funciona">
+      <div class="wrap">
+        <div class="section-head">
+          <h2>Da conta criada ao alerta na tela.</h2>
+          <p>O fluxo foi desenhado para ser claro: conectar canais, publicar pagina e adicionar o overlay.</p>
+        </div>
+        <div class="steps">
+          <article class="step"><b>PASSO 1</b><h3>Crie seu espaco</h3><p>Escolha o nome do canal e acesse o painel para configurar valores, mensagens e visual.</p></article>
+          <article class="step"><b>PASSO 2</b><h3>Conecte YouTube e Twitch</h3><p>Autorize os canais para manter sua identidade, links e proximas integracoes no mesmo lugar.</p></article>
+          <article class="step"><b>PASSO 3</b><h3>Coloque no OBS</h3><p>Adicione a URL do overlay como Browser Source e teste os alertas antes de abrir a live.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="cta">
+      <div class="wrap cta-box">
+        <div>
+          <h2>Pronto para testar com sua live?</h2>
+          <p>A home ja conversa com as paginas locais de donate e overlay do seu projeto.</p>
+        </div>
+        <a class="btn primary" href="/login.html?tab=signup">Criar conta gratis</a>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap footer-inner">
+      <span>SpaceDonate v2.0 - ambiente local</span>
+      <span><a href="/donate.html">Donate</a> / <a href="/overlay.html?test=true">Overlay teste</a></span>
+    </div>
+  </footer>
+
+  <script>
+    const notice = document.getElementById('authNotice')
+
+    // Detecta se já está logado e atualiza a nav
+    async function loadAuthStatus() {
+      try {
+        const res = await fetch('/api/auth/me')
+        if (!res.ok) return
+        const { user } = await res.json()
+        if (notice) notice.textContent = 'Você está logado como ' + user.creatorName + '.'
+        document.querySelector('.nav-actions').innerHTML =
+          '<a class="btn ghost" href="/dashboard.html">Painel</a>' +
+          '<button class="btn primary" id="logoutHome" type="button">Sair</button>'
+        document.getElementById('logoutHome').addEventListener('click', async () => {
+          await fetch('/api/auth/logout', { method: 'POST' })
+          window.location.reload()
+        })
+        // Só busca conexões se estiver logado
+        loadConnectionStatus()
+      } catch {
+        // Página funciona sem servidor (abertura estática)
+      }
+    }
+
+    // Atualiza status de conexão dos botões OAuth no card
+    async function loadConnectionStatus() {
+      try {
+        const res = await fetch('/api/connections')
+        if (!res.ok) return
+        const data = await res.json()
+        document.querySelectorAll('.connect[data-platform]').forEach(el => {
+          const info = data[el.dataset.platform]
+          if (!info?.connected) return
+          el.classList.add('connected')
+          const sub = el.querySelector('span span')
+          if (sub) sub.textContent = info.displayName || 'Conectado'
+        })
+      } catch {
+        // Silencioso
+      }
+    }
+
+    // Trata query strings vindas do servidor
+    const params = new URLSearchParams(location.search)
+    if (params.get('connected') && notice) {
+      const platform = params.get('connected') === 'youtube' ? 'YouTube' : 'Twitch'
+      notice.textContent = platform + ' conectado com sucesso.'
+      history.replaceState(null, '', location.pathname + location.hash)
+    } else if (params.get('auth') === 'login_required') {
+      window.location.href = '/login.html'
+    } else if (params.get('oauth_error') && notice) {
+      notice.textContent = params.get('oauth_error')
+      history.replaceState(null, '', location.pathname + location.hash)
+    }
+
+    loadAuthStatus()
+  </script>
+</body>
+</html>
