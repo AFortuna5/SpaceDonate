@@ -1,0 +1,5 @@
+Execute no terminal:
+
+git add .
+git commit -m "Organiza estrutura e otimiza projeto"
+git push origin main

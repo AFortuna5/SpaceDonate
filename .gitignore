@@ -1,10 +1,8 @@
-<<<<<<< HEAD
 node_modules
-=======
+.next
+dist
+coverage
 .env
-.data/
-.oauth-connections.json
-payment-server.*.log
-node-server.*.log
-node_modules/
->>>>>>> 3d71c87aa8389a3a8a24bc1f6a466904ffab09a0
+.vercel
+.DS_Store
+*.log
