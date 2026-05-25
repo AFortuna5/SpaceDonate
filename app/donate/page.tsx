@@ -1,0 +1,676 @@
+
+        export default function Page() {
+          return (
+            <>
+              <style>{`
+    :root {
+      --bg:      #080808;
+      --surface: #0f0f0f;
+      --border:  #1e1e1e;
+      --border2: #2a2a2a;
+      --text:    #f0f0f0;
+      --muted:   #525252;
+      --muted2:  #333;
+      --accent:  #c8ff00;
+      --accent2: rgba(200,255,0,0.08);
+      --accent3: rgba(200,255,0,0.15);
+      --red:     #ff4d4d;
+      --green:   #00e676;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Outfit', sans-serif;
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+      overflow-x: hidden;
+    }
+
+    /* ── Grain overlay ───────────────────────────────────────── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.6;
+    }
+
+    /* ── Accent glow ─────────────────────────────────────────── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: -30%;
+      right: -20%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(circle, rgba(200,255,0,0.04) 0%, transparent 65%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    main {
+      position: relative;
+      z-index: 1;
+      width: min(1100px, 100%);
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 0;
+      min-height: min(700px, 90dvh);
+      border: 1px solid var(--border);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    /* ── LEFT PANEL ─────────────────────────────────────────── */
+    .left {
+      padding: 56px 52px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      border-right: 1px solid var(--border);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .left::before {
+      content: '';
+      position: absolute;
+      bottom: -60px;
+      left: -60px;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(200,255,0,0.06) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid var(--border2);
+      padding: 6px 14px;
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      color: var(--muted);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      width: fit-content;
+      margin-bottom: 40px;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.5; transform: scale(0.85); }
+    }
+
+    .headline {
+      font-family: 'Syne', sans-serif;
+      font-size: clamp(2.8rem, 5.5vw, 5.4rem);
+      font-weight: 800;
+      line-height: 0.92;
+      letter-spacing: -0.03em;
+      color: var(--text);
+    }
+
+    .headline em {
+      font-style: normal;
+      color: var(--accent);
+      display: block;
+    }
+
+    .sub {
+      margin-top: 28px;
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 300;
+      line-height: 1.75;
+      max-width: 400px;
+    }
+
+    .stats {
+      display: flex;
+      gap: 40px;
+      margin-top: auto;
+      padding-top: 56px;
+    }
+
+    .stat-num {
+      font-family: 'DM Mono', monospace;
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: var(--text);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 4px;
+    }
+
+    /* ── RIGHT PANEL (FORM) ─────────────────────────────────── */
+    .right {
+      padding: 48px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      background: #0a0a0a;
+    }
+
+    .form-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: 0.02em;
+      margin-bottom: 32px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .form-title::before {
+      content: '';
+      display: block;
+      width: 18px;
+      height: 2px;
+      background: var(--accent);
+    }
+
+    /* Preset amounts */
+    .amount-presets {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .preset-btn {
+      border: 1px solid var(--border2);
+      background: transparent;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      padding: 10px 0;
+      cursor: pointer;
+      transition: all 0.15s;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preset-btn::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: var(--accent2);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .preset-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .preset-btn:hover::after { opacity: 1; }
+
+    .preset-btn.active {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent2);
+    }
+
+    /* Field group */
+    .field {
+      margin-bottom: 16px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 8px;
+    }
+
+    input, textarea {
+      width: 100%;
+      padding: 12px 14px;
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 2px var(--accent3);
+    }
+
+    input::placeholder, textarea::placeholder {
+      color: var(--muted2);
+    }
+
+    input[type="number"]::-webkit-inner-spin-button,
+    input[type="number"]::-webkit-outer-spin-button {
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .field-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    /* Amount input with prefix */
+    .amount-wrap {
+      position: relative;
+    }
+
+    .amount-prefix {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.82rem;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .amount-wrap input {
+      padding-left: 42px;
+      font-family: 'DM Mono', monospace;
+      font-size: 1.1rem;
+    }
+
+    /* Submit */
+    .submit-btn {
+      width: 100%;
+      margin-top: 8px;
+      padding: 16px;
+      background: var(--accent);
+      color: #080808;
+      border: none;
+      font-family: 'Syne', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: opacity 0.2s, transform 0.1s;
+    }
+
+    .submit-btn::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.12);
+      opacity: 0;
+      transition: opacity 0.15s;
+    }
+
+    .submit-btn:hover::before { opacity: 1; }
+    .submit-btn:active { transform: scale(0.99); }
+
+    .submit-btn:disabled {
+      opacity: 0.5;
+      cursor: wait;
+    }
+
+    /* Status */
+    .status {
+      min-height: 18px;
+      margin-top: 12px;
+      font-size: 0.8rem;
+      font-family: 'DM Mono', monospace;
+      color: var(--muted);
+    }
+
+    .status.error   { color: var(--red); }
+    .status.success { color: var(--accent); }
+
+    /* Pix result */
+    .pix-result {
+      display: none;
+      margin-top: 24px;
+      border-top: 1px solid var(--border);
+      padding-top: 24px;
+      animation: slideUp 0.3s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .pix-result.open { display: block; }
+
+    .pix-label {
+      font-size: 0.72rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 16px;
+    }
+
+    .pix-inner {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .pix-result img {
+      display: block;
+      width: 90px;
+      height: 90px;
+      padding: 6px;
+      background: white;
+    }
+
+    .pix-copy-area {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pix-code-text {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--border2);
+      padding: 10px;
+      word-break: break-all;
+      line-height: 1.5;
+      max-height: 60px;
+      overflow: hidden;
+      user-select: all;
+    }
+
+    .copy-btn {
+      padding: 9px 16px;
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .pix-note {
+      margin-top: 12px;
+      font-size: 0.7rem;
+      color: var(--muted2);
+      font-family: 'DM Mono', monospace;
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────────────────── */
+    @media (max-width: 820px) {
+      main {
+        grid-template-columns: 1fr;
+        min-height: auto;
+      }
+
+      .left {
+        padding: 40px 32px;
+        border-right: none;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .stats { padding-top: 36px; }
+
+      .right { padding: 36px 32px; }
+
+      .field-row { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 480px) {
+      body { padding: 0; }
+      main { border: none; border-top: none; }
+      .left, .right { padding: 28px 20px; }
+      .amount-presets { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    }
+
+    /* ── ANIMATIONS ─────────────────────────────────────────── */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .left  { animation: fadeIn 0.5s ease both; }
+    .right { animation: fadeIn 0.5s 0.1s ease both; }
+
+  `}</style>
+              <div dangerouslySetInnerHTML={{ __html: `
+  <main>
+
+    <!-- ── LEFT ── -->
+    <section class="left">
+      <div>
+        <div class="badge">
+          <span class="badge-dot"></span>
+          SpaceDonate · Pix Placeholder
+        </div>
+
+        <h1 class="headline">
+          Apoia<br>a
+          <em>Live.</em>
+        </h1>
+
+        <p class="sub">
+          Manda seu suporte direto pelo Pix. O alerta aparece na tela
+          em tempo real — sem demora, sem complicação.
+        </p>
+      </div>
+
+      <div class="stats">
+        <div class="stat-item">
+          <div class="stat-num" id="statCount">—</div>
+          <div class="stat-label">Donates hoje</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">R$ 1</div>
+          <div class="stat-label">Mínimo</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-num">Pix</div>
+          <div class="stat-label">Instantâneo</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── RIGHT (FORM) ── -->
+    <section class="right">
+      <div class="form-title">Novo donate</div>
+
+      <form id="donationForm">
+
+        <div class="field">
+          <label>Valor</label>
+          <div class="amount-presets" id="presets">
+            <button type="button" class="preset-btn" data-val="5">R$5</button>
+            <button type="button" class="preset-btn" data-val="10">R$10</button>
+            <button type="button" class="preset-btn" data-val="25">R$25</button>
+            <button type="button" class="preset-btn" data-val="50">R$50</button>
+          </div>
+          <div class="amount-wrap">
+            <span class="amount-prefix">R$</span>
+            <input id="amount" name="amount" type="number" min="1" step="0.01" placeholder="0,00" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Seu nome no alerta</label>
+          <input id="name" name="name" maxlength="40" placeholder="GamerXP_BR" required>
+        </div>
+
+        <div class="field">
+          <label>E-mail <span style="font-size:0.62rem;opacity:.5">(opcional)</span></label>
+          <input id="email" name="email" type="email" placeholder="voce@email.com">
+        </div>
+
+        <div class="field">
+          <label>Mensagem <span style="font-size:0.62rem;opacity:.5">(opcional)</span></label>
+          <textarea id="message" name="message" maxlength="180" placeholder="Manda um salve na live!"></textarea>
+        </div>
+
+        <button id="submitButton" class="submit-btn" type="submit">
+          Gerar Pix
+        </button>
+
+        <div id="status" class="status" role="status" aria-live="polite"></div>
+      </form>
+
+      <!-- Pix result -->
+      <div id="pixResult" class="pix-result">
+        <div class="pix-label">QR Code gerado — não pague este código</div>
+        <div class="pix-inner">
+          <img id="pixQrCode" alt="QR Code Pix placeholder">
+          <div class="pix-copy-area">
+            <div id="pixCodeDisplay" class="pix-code-text"></div>
+            <button id="copyButton" class="copy-btn" type="button">[ copiar código ]</button>
+          </div>
+        </div>
+        <div class="pix-note">// placeholder local · nenhum pagamento real</div>
+      </div>
+    </section>
+
+  </main>
+
+  <script>
+    // ── Preset buttons ────────────────────────────────────────
+    const amountInput = document.getElementById('amount')
+    const presets     = document.querySelectorAll('.preset-btn')
+
+    presets.forEach(btn => {
+      btn.addEventListener('click', () => {
+        presets.forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        amountInput.value = btn.dataset.val
+      })
+    })
+
+    amountInput.addEventListener('input', () => {
+      presets.forEach(b => b.classList.remove('active'))
+      presets.forEach(b => {
+        if (b.dataset.val === amountInput.value) b.classList.add('active')
+      })
+    })
+
+    // ── Simulate donate count ─────────────────────────────────
+    document.getElementById('statCount').textContent =
+      Math.floor(Math.random() * 40 + 5)
+
+    // ── Form submit ───────────────────────────────────────────
+    const form        = document.getElementById('donationForm')
+    const statusEl    = document.getElementById('status')
+    const submitBtn   = document.getElementById('submitButton')
+    const pixResult   = document.getElementById('pixResult')
+    const pixQrCode   = document.getElementById('pixQrCode')
+    const pixDisplay  = document.getElementById('pixCodeDisplay')
+    let   pixCodeVal  = ''
+
+    function setStatus(msg, type = '') {
+      statusEl.textContent = msg
+      statusEl.className = `status ${type}`.trim()
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault()
+      const fd = new FormData(form)
+      const payload = {
+        name:    fd.get('name').trim(),
+        amount:  Number(fd.get('amount')),
+        email:   fd.get('email').trim(),
+        message: fd.get('message').trim()
+      }
+
+      if (!payload.name || !payload.amount || payload.amount < 1) {
+        setStatus('Informe nome e valor mínimo de R$1,00.', 'error')
+        return
+      }
+
+      submitBtn.disabled = true
+      pixResult.classList.remove('open')
+      setStatus('Gerando...')
+
+      try {
+        const res  = await fetch('/api/create-donation', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        })
+        const data = await res.json()
+
+        if (!res.ok) throw new Error(data.error || 'Erro ao gerar Pix.')
+
+        pixQrCode.src        = data.brCodeBase64
+        pixDisplay.textContent = data.brCode
+        pixCodeVal            = data.brCode
+        pixResult.classList.add('open')
+        setStatus('Pix gerado com sucesso.', 'success')
+
+        // bump counter
+        const el = document.getElementById('statCount')
+        el.textContent = String(Number(el.textContent) + 1)
+      } catch (err) {
+        setStatus(err.message, 'error')
+      } finally {
+        submitBtn.disabled = false
+      }
+    })
+
+    // ── Copy ─────────────────────────────────────────────────
+    document.getElementById('copyButton').addEventListener('click', async () => {
+      if (!pixCodeVal) return
+      await navigator.clipboard.writeText(pixCodeVal)
+      setStatus('Código copiado.', 'success')
+    })
+  </script>
+` }} />
+            </>
+          );
+        }
