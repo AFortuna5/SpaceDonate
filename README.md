@@ -14,31 +14,3 @@ Projeto SaaS de doações para streamers.
 
 ```bash
 npm install
-```
-
-## Rodar projeto
-
-```bash
-npm run dev
-```
-
-## Build produção
-
-```bash
-npm run build
-npm start
-```
-
-## Banco de dados
-
-Configure `.env`:
-
-```env
-DATABASE_URL=
-JWT_SECRET=
-```
-
-## Deploy
-- Frontend: Vercel
-- Banco: Neon PostgreSQL
-- Backend/API: Render
