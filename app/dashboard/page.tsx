@@ -1,11 +1,11 @@
-export default function DonatePage() {
+﻿export default function Page() {
   return (
     <iframe
-      src="/donate.html"
+      src="/dashboard.html"
       style={{
-        width: '100%',
-        height: '100vh',
-        border: 'none',
+        width: "100%",
+        height: "100vh",
+        border: "none",
       }}
     />
   );
