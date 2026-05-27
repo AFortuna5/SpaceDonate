@@ -13,7 +13,7 @@ export async function POST(req: Request) {
       where: { email },
     });
 
-    if (!user) {
+    if (!user || !user.passwordHash) {
       return NextResponse.json(
         { error: "Usuário não encontrado." },
         { status: 404 }
