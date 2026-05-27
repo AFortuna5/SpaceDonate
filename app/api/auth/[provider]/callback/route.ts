@@ -25,7 +25,7 @@ async function findOrCreateUser(profile: OAuthProfile) {
   let creatorName = baseName;
   let suffix = 1;
 
-  while (await prisma.user.findUnique({ where: { creatorName } })) {
+  while (await prisma.user.findFirst({ where: { creatorName } })) {
     creatorName = `${baseName}-${suffix++}`;
   }
 
