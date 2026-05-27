@@ -5,22 +5,19 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "prisma:generate": "prisma generate",
-    "prisma:migrate": "prisma migrate deploy"
+    "start": "next start"
   },
   "dependencies": {
     "@prisma/client": "^5.15.0",
     "@tanstack/react-query": "^5.59.0",
     "axios": "^1.7.7",
     "bcryptjs": "^2.4.3",
+    "cookie": "^1.1.1",
     "dotenv": "^16.4.5",
-    "jsonwebtoken": "^9.0.2",
+    "jsonwebtoken": "^9.0.3",
     "next": "^15.0.0",
     "nodemailer": "^6.9.13",
     "pg": "^8.12.0",
-    "prisma": "^5.15.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "socket.io": "^4.8.0",
@@ -30,9 +27,12 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jsonwebtoken": "^9.0.2",
     "@types/node": "^22.5.4",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
-    "eslint": "^9.10.0"
+    "eslint": "^9.10.0",
+    "prisma": "^5.15.0"
   }
 }

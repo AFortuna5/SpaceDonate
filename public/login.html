@@ -269,7 +269,7 @@
             <path d="M8 10l5.333-3L8 4v6Z" fill="#ff0000"/>
           </svg>
         </div>
-        <span class="oauth-name">Conectar YouTube (após login)</span>
+        <span class="oauth-name">Entrar com YouTube</span>
         <i class="ti ti-chevron-right oauth-arrow" aria-hidden="true"></i>
       </button>
 
@@ -280,7 +280,7 @@
             <path d="M9.8 6.3H11.9v6.3H9.8V6.3ZM15.05 6.3h2.1v6.3h-2.1V6.3Z" fill="#fff"/>
           </svg>
         </div>
-        <span class="oauth-name">Conectar Twitch (após login)</span>
+        <span class="oauth-name">Entrar com Twitch</span>
         <i class="ti ti-chevron-right oauth-arrow" aria-hidden="true"></i>
       </button>
 
@@ -320,7 +320,7 @@
 
       <div class="divider">
         <div class="divider-line"></div>
-        <span class="divider-text">ou cadastre-se com</span>
+        <span class="divider-text">ou entre com</span>
         <div class="divider-line"></div>
       </div>
 
@@ -331,7 +331,7 @@
             <path d="M8 10l5.333-3L8 4v6Z" fill="#ff0000"/>
           </svg>
         </div>
-        <span class="oauth-name">Conectar YouTube (após criar conta)</span>
+        <span class="oauth-name">Entrar com YouTube</span>
         <i class="ti ti-chevron-right oauth-arrow" aria-hidden="true"></i>
       </button>
 
@@ -342,7 +342,7 @@
             <path d="M9.8 6.3H11.9v6.3H9.8V6.3ZM15.05 6.3h2.1v6.3h-2.1V6.3Z" fill="#fff"/>
           </svg>
         </div>
-        <span class="oauth-name">Conectar Twitch (após criar conta)</span>
+        <span class="oauth-name">Entrar com Twitch</span>
         <i class="ti ti-chevron-right oauth-arrow" aria-hidden="true"></i>
       </button>
     </div>
@@ -444,16 +444,7 @@
     }
 
     function handleOAuth(platform) {
-      // Verifica se já tem sessão ativa antes de redirecionar
-      fetch('/api/auth/me').then(r => {
-        if (r.ok) {
-          window.location.href = '/auth/' + platform;
-        } else {
-          showToast('Entre ou crie uma conta primeiro. Depois conecte o ' + (platform === 'youtube' ? 'YouTube' : 'Twitch') + ' no painel.');
-        }
-      }).catch(() => {
-        showToast('Servidor indisponível. Tente novamente.');
-      });
+      window.location.href = '/auth/' + platform;
     }
 
     // Abre aba correta via ?tab=signup ou ?tab=login

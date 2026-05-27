@@ -5,22 +5,27 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id String @id @default(uuid())
-  email String @unique
-  creatorName String
-  passwordHash String?
-  createdAt DateTime @default(now())
+  id           String     @id @default(cuid())
+  email        String     @unique
+  creatorName  String     @unique
+  passwordHash String
+  createdAt    DateTime   @default(now())
+
+  donations Donation[]
 }
 
 model Donation {
-  id String @id @default(uuid())
-  name String
-  amount Int
-  message String?
-  status String
+  id        String   @id @default(cuid())
+  name      String
+  amount    Float
+  message   String?
+  status    String   @default("pending")
   createdAt DateTime @default(now())
+
+  userId String?
+  user   User? @relation(fields: [userId], references: [id])
 }
