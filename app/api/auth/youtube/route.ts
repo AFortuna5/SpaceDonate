@@ -7,21 +7,38 @@ export async function GET(req: NextRequest) {
   const cfg = getOAuthConfig(provider);
 
   if (!cfg) {
-    return NextResponse.json({ error: "Provedor OAuth inválido." }, { status: 404 });
+    return NextResponse.redirect(
+      new URL(
+        `/login.html?oauth_error=${encodeURIComponent(`Provedor OAuth inválido.`)}`,
+        req.url
+      )
+    );
   }
 
   const missing = missingOAuthConfig(cfg);
   if (missing.length) {
+    const message = `⚠️ Configuração incompleta: ${missing.join(", ")} não configuradas no Vercel. Entre em https://vercel.com/afortuna5/space-donate/settings/environment-variables e adicione as variáveis.`;
     return NextResponse.redirect(
       new URL(
-        `/login.html?oauth_error=${encodeURIComponent(`Configure ${missing.join(", ")} no .env antes de conectar ${cfg.name}.`)}`,
+        `/login.html?oauth_error=${encodeURIComponent(message)}`,
         req.url
       )
     );
   }
 
   const state = crypto.randomBytes(24).toString("hex");
-  const redirectUrl = buildOAuthRedirectUrl(provider, state, req);
+  let redirectUrl: string;
+  try {
+    redirectUrl = buildOAuthRedirectUrl(provider, state, req);
+  } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : "Erro ao configurar OAuth.";
+    return NextResponse.redirect(
+      new URL(
+        `/login.html?oauth_error=${encodeURIComponent(errorMsg)}`,
+        req.url
+      )
+    );
+  }
 
   const response = NextResponse.redirect(redirectUrl);
   response.cookies.set("sd_oauth_state", state, {

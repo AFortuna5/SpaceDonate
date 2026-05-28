@@ -156,9 +156,20 @@ export function buildOAuthRedirectUrl(provider: OAuthProvider, state: string, re
   const cfg = getOAuthConfig(provider);
   if (!cfg) throw new Error("Provider inválido.");
 
+  // Validar credenciais antes de construir redirect
+  if (!cfg.clientId || !cfg.clientSecret) {
+    const missing = [];
+    if (!cfg.clientId) missing.push(`${cfg.name.toUpperCase()}_CLIENT_ID`);
+    if (!cfg.clientSecret) missing.push(`${cfg.name.toUpperCase()}_CLIENT_SECRET`);
+    throw new Error(
+      `⚠️ ${missing.join(", ")} não configuradas no Vercel. ` +
+      `Acesse https://vercel.com/afortuna5/space-donate/settings/environment-variables`
+    );
+  }
+
   const redirectUri = getRedirectUri(provider, request);
   const params = new URLSearchParams({
-    client_id: cfg.clientId || "",
+    client_id: cfg.clientId,
     redirect_uri: redirectUri,
     response_type: "code",
     scope: cfg.scope,
