@@ -334,12 +334,16 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 13px;
+      justify-content: flex-start;
+      gap: 14px;
+      padding: 0 14px;
     }
 
     .connect strong { display: block; }
     .connect span { display: block; margin-top: 3px; color: var(--muted); font-size: 0.74rem; }
+    .connect > div { display: grid; }
+    .connect[data-platform="youtube"] i { background: var(--youtube); }
+    .connect[data-platform="twitch"] i { background: var(--twitch); }
     .connect[data-platform="youtube"] i { background: var(--youtube); }
     .connect[data-platform="twitch"] i { background: var(--twitch); }
 
@@ -751,16 +755,24 @@
             <a class="connect" href="/api/auth/youtube" data-platform="youtube">
               <i aria-hidden="true">
                 <svg viewBox="0 0 24 24" focusable="false">
-                  <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24
-              <span><strong>YouTube</strong><span>Entrar com YouTube</span></span>
-            </a>
-            <a class="connect" href="/auth/twitch" data-platform="twitch">
-              <i aria-hidden="true">
-                <svg viewBox="0 0 24 24" focusable="false">
-                  <path d="M4.4 2 3 5.8v14h4.8V22h2.7l2.2-2.2h3.6L21 15.1V2H4.4Zm14.3 12-2.7 2.7h-4.1l-2.2 2.2v-2.2H6.2V4.3h12.5V14Zm-2.2-6.3v4.9h-2.2V7.7h2.2Zm-5.8 0v4.9H8.5V7.7h2.2Z"/>
+                  <path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM10 16V8l6 4-6 4Z" />
                 </svg>
               </i>
-              <span><strong>Twitch</strong><span>Entrar com Twitch</span></span>
+              <div>
+                <strong>YouTube</strong>
+                <span>Entrar com YouTube</span>
+              </div>
+            </a>
+            <a class="connect" href="/api/auth/twitch" data-platform="twitch">
+              <i aria-hidden="true">
+                <svg viewBox="0 0 24 24" focusable="false">
+                  <path d="M4.4 2 3 5.8v14h4.8V22h2.7l2.2-2.2h3.6L21 15.1V2H4.4Zm14.3 12-2.7 2.7h-4.1l-2.2 2.2v-2.2H6.2V4.3h12.5V14Zm-2.2-6.3v4.9h-2.2V7.7h2.2Zm-5.8 0v4.9H8.5V7.7h2.2Z" />
+                </svg>
+              </i>
+              <div>
+                <strong>Twitch</strong>
+                <span>Entrar com Twitch</span>
+              </div>
             </a>
           </div>
 
