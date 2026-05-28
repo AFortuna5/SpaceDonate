@@ -3,6 +3,7 @@ node_modules
 dist
 coverage
 .env
+.env.production*
 .vercel
 .DS_Store
 *.log
