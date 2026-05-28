@@ -53,7 +53,7 @@ export function getRedirectUri(provider: OAuthProvider, request: NextRequest) {
   const origin = getBaseUrl(request);
   return process.env[
     provider === "youtube" ? "YOUTUBE_REDIRECT_URI" : "TWITCH_REDIRECT_URI"
-  ] || `${origin}/auth/${provider}/callback`;
+  ] || `${origin}/api/auth/${provider}/callback`;
 }
 
 export function missingOAuthConfig(cfg: OAuthConfig) {
