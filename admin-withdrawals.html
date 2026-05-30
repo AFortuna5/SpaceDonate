@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Admin — Saques</title>
+  <style>
+    body{font-family:Inter,Arial;background:#070807;color:#f2f4ec;padding:20px}
+    .wrap{max-width:1100px;margin:0 auto}
+    .panel{background:#0b0c0a;border:1px solid rgba(255,255,255,0.04);padding:14px;border-radius:10px}
+    .list{display:grid;gap:8px;margin-top:12px}
+    .item{display:flex;justify-content:space-between;align-items:center;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04)}
+    button{padding:8px 10px;border-radius:8px;background:#222;border:1px solid #333;color:#fff;cursor:pointer}
+    .primary{background:#c8ff00;color:#080a06;border-color:#c8ff00}
+    .muted{color:#9aa08f}
+    input{padding:8px;border-radius:8px;border:1px solid #222;background:#070807;color:inherit}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Admin — Solicitações de Saque</h1>
+    <div class="panel">
+      <div style="display:flex;gap:8px;align-items:center">
+        <label class="muted">Token admin</label>
+        <input id="adminToken" placeholder="Cole o token administrativo aqui (ADMIN_TOKEN)">
+        <button id="loadBtn" class="primary">Carregar</button>
+      </div>
+
+      <div id="list" class="list"></div>
+    </div>
+  </div>
+
+  <script>
+    function fmt(c){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format((c||0)/100) }
+    let token = ''
+    document.getElementById('loadBtn').addEventListener('click', ()=>{ token = document.getElementById('adminToken').value.trim(); load() })
+
+    async function load(){
+      const listEl = document.getElementById('list')
+      listEl.innerHTML = 'Carregando...'
+      try{
+        const res = await fetch('/api/admin/withdrawals',{ headers: token? { 'x-admin-token': token } : {} })
+        if (!res.ok) throw new Error('Acesso negado')
+        const data = await res.json()
+        listEl.innerHTML = ''
+        for (const w of data.withdrawals) {
+          const d = document.createElement('div')
+          d.className = 'item'
+          d.innerHTML = `<div><strong>${w.id}</strong> <div class="muted">${w.method.toUpperCase()} · ${w.createdAt}</div> <div class="muted">Usuário: ${w.userId}</div></div>
+                         <div style="text-align:right"><div>${fmt(w.amount)}</div><div class="muted">${w.status}</div>
+                         <div style="margin-top:6px"><button data-id="${w.id}" class="complete">COMPLETED</button> <button data-id="${w.id}" class="reject">REJECT</button></div></div>`
+          listEl.appendChild(d)
+        }
+        setupActions()
+      }catch(err){ listEl.innerHTML = '<div class="muted">Erro: ' + err.message + '</div>' }
+    }
+
+    function setupActions(){
+      document.querySelectorAll('button.complete').forEach(b=> b.addEventListener('click', ()=> update(b.dataset.id,'COMPLETED')))
+      document.querySelectorAll('button.reject').forEach(b=> b.addEventListener('click', ()=> update(b.dataset.id,'REJECTED')))
+    }
+
+    async function update(id, status){
+      if (!confirm(`Marcar ${id} como ${status}?`)) return
+      try{
+        const res = await fetch('/api/admin/withdrawals/update', {
+          method: 'POST', headers: Object.assign({'Content-Type':'application/json'}, token? { 'x-admin-token': token } : {}),
+          body: JSON.stringify({ id, status })
+        })
+        if (!res.ok) throw new Error((await res.json()).error || 'Falha')
+        alert('Atualizado')
+        load()
+      }catch(err){ alert('Erro: '+err.message) }
+    }
+  </script>
+</body>
+</html>

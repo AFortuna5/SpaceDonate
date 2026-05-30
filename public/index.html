@@ -189,6 +189,24 @@
       flex-wrap: wrap;
     }
 
+    .hero-notes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .hero-notes span {
+      display: inline-flex;
+      align-items: center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-size: 0.85rem;
+      color: #f9fafb;
+    }
+
     .trust-row {
       margin-top: 44px;
       display: grid;
@@ -697,6 +715,46 @@
   </header>
 
   <main>
+
+  <script>
+    // Hero typing effect + subtle star particles
+    (function(){
+      const el = document.querySelector('.lead')
+      if (!el) return
+      const texts = [
+        'Receba doações rápidas via PIX — feito para streamers.',
+        'Overlay animado, alertas em tempo real e metas visíveis.'
+      ]
+      let i = 0, pos = 0, forward = true
+      function tick() {
+        const t = texts[i]
+        el.textContent = t.slice(0, pos)
+        if (forward) { pos++ ; if (pos>t.length){ forward=false; setTimeout(tick,900); return } }
+        else { pos-- ; if (pos<=0){ forward=true; i=(i+1)%texts.length } }
+        setTimeout(tick, forward?40:24)
+      }
+      tick()
+
+      // simple particle background (few DOM nodes)
+      const wrap = document.querySelector('.hero')
+      if (wrap) {
+        for (let s=0;s<22;s++){
+          const star = document.createElement('div')
+          star.style.position='absolute'
+          star.style.width = star.style.height = (Math.random()*3+1)+'px'
+          star.style.left = (Math.random()*85+5)+'%'
+          star.style.top = (Math.random()*70+10)+'%'
+          star.style.background = Math.random()>0.85? 'var(--pink)' : 'rgba(255,255,255,0.08)'
+          star.style.borderRadius='50%'
+          star.style.opacity = (Math.random()*0.6+0.2)+''
+          star.style.transform = `translateZ(0)`
+          star.style.transition = 'transform 3s ease-in-out'
+          wrap.appendChild(star)
+          setInterval(()=>{ star.style.transform = `translateY(${(Math.random()*6-3)}px)` }, 2500+Math.random()*2000)
+        }
+      }
+    })()
+  </script>
     <section class="wrap hero">
       <div>
         <div class="eyebrow">Pix, alertas e widgets para streamers</div>
@@ -708,6 +766,11 @@
           <a class="btn primary" href="/login.html?tab=signup">Comecar agora</a>
           <a class="btn" href="/donate.html">Ver pagina de donate</a>
           <a class="btn ghost" href="/overlay.html?test=true">Preview do overlay</a>
+        </div>
+        <div class="hero-notes">
+          <span>OBS / Browser Source pronto</span>
+          <span>Conector YouTube + Twitch</span>
+          <span>Interface leve, mobile-ready</span>
         </div>
         <div class="trust-row">
           <div class="metric"><strong>2%</strong><span>taxa planejada no Pix</span></div>
@@ -816,7 +879,7 @@
         <div class="steps">
           <article class="step"><b>PASSO 1</b><h3>Crie seu espaco</h3><p>Escolha o nome do canal e acesse o painel para configurar valores, mensagens e visual.</p></article>
           <article class="step"><b>PASSO 2</b><h3>Conecte YouTube e Twitch</h3><p>Autorize os canais para manter sua identidade, links e proximas integracoes no mesmo lugar.</p></article>
-          <article class="step"><b>PASSO 3</b><h3>Coloque no OBS</h3><p>Adicione a URL do overlay como Browser Source e teste os alertas antes de abrir a live.</p></article>
+          <article class="step"><b>PASSO 3</b><h3>Adicione ao OBS</h3><p>Use o overlay como Browser Source em 1920×1080, deixe transparente e veja os alertas em tempo real na live.</p></article>
         </div>
       </div>
     </section>
@@ -848,6 +911,7 @@
         const res = await fetch('/api/auth/me')
         if (!res.ok) return
         const { user } = await res.json()
+        if (!user) return
         if (notice) notice.textContent = 'Você está logado como ' + user.creatorName + '.'
         document.querySelector('.nav-actions').innerHTML =
           '<a class="btn ghost" href="/dashboard.html">Painel</a>' +

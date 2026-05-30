@@ -451,6 +451,149 @@
       font-family: 'DM Mono', monospace;
     }
 
+    .obs-instructions {
+      margin-top: 24px;
+      padding: 20px;
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 16px;
+    }
+
+    .obs-instructions h3 {
+      margin-bottom: 10px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+    }
+
+    .obs-instructions p {
+      color: var(--muted);
+      line-height: 1.7;
+      margin-bottom: 12px;
+    }
+
+    .obs-instructions ul {
+      list-style: none;
+      padding-left: 0;
+      margin: 0;
+      display: grid;
+      gap: 8px;
+    }
+
+    .obs-instructions li {
+      position: relative;
+      padding-left: 24px;
+      color: var(--text);
+      line-height: 1.5;
+    }
+
+    .obs-instructions li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .share-panel {
+      margin-top: 26px;
+      padding: 18px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.03);
+      border-radius: 14px;
+    }
+
+    .share-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+      margin-bottom: 8px;
+    }
+
+    .share-panel p {
+      color: var(--muted);
+      line-height: 1.55;
+      margin-bottom: 14px;
+    }
+
+    .copy-btn {
+      padding: 11px 16px;
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      cursor: pointer;
+      transition: all 0.15s;
+      letter-spacing: 0.05em;
+    }
+
+    .copy-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .page-top {
+      position: relative;
+      z-index: 2;
+      width: min(1100px, 100%);
+      margin: 0 auto 24px;
+      background: rgba(10, 10, 10, 0.9);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 18px;
+      backdrop-filter: blur(16px);
+    }
+
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 18px 24px;
+      min-height: 76px;
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--accent);
+      color: #080808;
+      font-family: 'DM Mono', monospace;
+      font-weight: 800;
+    }
+
+    .brand-row strong {
+      display: block;
+      font-size: 0.95rem;
+    }
+
+    .brand-row small {
+      display: block;
+      color: var(--muted);
+      font-size: 0.8rem;
+    }
+
+    .top-links {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      justify-content: flex-end;
+    }
+
+    .copy-overlay {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
     /* ── RESPONSIVE ─────────────────────────────────────────── */
     @media (max-width: 820px) {
       main {
@@ -490,6 +633,23 @@
   </style>
 </head>
 <body>
+  <header class="page-top">
+    <div class="wrap top-bar">
+      <div class="brand-row">
+        <span class="brand-mark">SD</span>
+        <div>
+          <strong>SpaceDonate</strong>
+          <small>Pix, alertas e overlay para streamers</small>
+        </div>
+      </div>
+      <div class="top-links">
+        <a class="btn ghost" href="/">Home</a>
+        <a class="btn" href="/overlay.html?test=true">Overlay teste</a>
+        <a class="btn ghost" href="/login.html">Login</a>
+      </div>
+    </div>
+  </header>
+
   <main>
 
     <!-- ── LEFT ── -->
@@ -524,6 +684,12 @@
           <div class="stat-num">Pix</div>
           <div class="stat-label">Instantâneo</div>
         </div>
+      </div>
+
+      <div class="share-panel">
+        <div class="share-title">Pronto para compartilhar</div>
+        <p>Copie o link desta página para colocar no chat, na descrição da live ou nas redes sociais.</p>
+        <button id="shareButton" class="copy-btn" type="button">Copiar link da página</button>
       </div>
     </section>
 
@@ -571,7 +737,7 @@
 
       <!-- Pix result -->
       <div id="pixResult" class="pix-result">
-        <div class="pix-label">QR Code gerado — não pague este código</div>
+        <div id="pixLabel" class="pix-label">QR Code gerado</div>
         <div class="pix-inner">
           <img id="pixQrCode" alt="QR Code Pix placeholder">
           <div class="pix-copy-area">
@@ -579,7 +745,20 @@
             <button id="copyButton" class="copy-btn" type="button">[ copiar código ]</button>
           </div>
         </div>
-        <div class="pix-note">// placeholder local · nenhum pagamento real</div>
+        <div id="pixNote" class="pix-note">// aguardando pagamento</div>
+      </div>
+      <div class="obs-instructions">
+        <h3>Use este link na live</h3>
+        <p>Compartilhe essa página no chat ou coloque o overlay no OBS. A URL pode ser adicionada como Browser Source para avisar os alerts em tempo real.</p>
+        <ul>
+          <li>1. Copie o link deste navegador</li>
+          <li>2. Adicione em OBS como Browser Source</li>
+          <li>3. Teste com /overlay.html?test=true</li>
+        </ul>
+        <div class="copy-overlay">
+          <button id="copyOverlayLinkBtn" class="copy-btn" type="button">Copiar link de teste do overlay</button>
+          <span style="color: var(--muted); font-size: 0.9rem;">Use este link para validar o overlay no OBS antes da live.</span>
+        </div>
       </div>
     </section>
 
@@ -616,6 +795,8 @@
     const pixResult   = document.getElementById('pixResult')
     const pixQrCode   = document.getElementById('pixQrCode')
     const pixDisplay  = document.getElementById('pixCodeDisplay')
+    const pixLabel    = document.getElementById('pixLabel')
+    const pixNote     = document.getElementById('pixNote')
     let   pixCodeVal  = ''
 
     function setStatus(msg, type = '') {
@@ -655,6 +836,11 @@
         pixQrCode.src        = data.brCodeBase64
         pixDisplay.textContent = data.brCode
         pixCodeVal            = data.brCode
+        const realPix = data.provider === 'abacatepay'
+        pixLabel.textContent = realPix ? 'QR Code Pix gerado' : 'QR Code gerado - modo demonstracao'
+        pixNote.textContent = realPix
+          ? '// pagamento real via AbacatePay - o alerta aparece apos confirmacao'
+          : '// placeholder local - nenhum pagamento real'
         pixResult.classList.add('open')
         setStatus('Pix gerado com sucesso.', 'success')
 
@@ -673,6 +859,33 @@
       if (!pixCodeVal) return
       await navigator.clipboard.writeText(pixCodeVal)
       setStatus('Código copiado.', 'success')
+    })
+
+    document.getElementById('shareButton').addEventListener('click', async () => {
+      const pageLink = location.href
+      try {
+        if (navigator.share) {
+          await navigator.share({
+            title: 'SpaceDonate — Página de donate',
+            text: 'Apoie a live com Pix',
+            url: pageLink
+          })
+        } else {
+          await navigator.clipboard.writeText(pageLink)
+          setStatus('Link copiado para a área de transferência.', 'success')
+        }
+      } catch (err) {
+        setStatus('Não foi possível compartilhar agora.', 'error')
+      }
+    })
+
+    document.getElementById('copyOverlayLinkBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(location.origin + '/overlay.html?test=true')
+        setStatus('Link do overlay de teste copiado.', 'success')
+      } catch {
+        setStatus('Não foi possível copiar o link do overlay.', 'error')
+      }
     })
   </script>
 </body>

@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Carteira — SpaceDonate</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <style>
+    body{font-family:Inter,Arial,Helvetica,sans-serif;background:#070807;color:#f2f4ec;padding:28px}
+    .wrap{max-width:980px;margin:0 auto}
+    .panel{background:#0b0c0a;border:1px solid rgba(255,255,255,0.04);padding:18px;border-radius:12px}
+    h1{font-family:Syne,Arial;font-size:1.6rem}
+    .balance{display:flex;gap:18px;align-items:center}
+    .big{font-family:'DM Mono',monospace;font-size:2.2rem;color:#bdf87a}
+    .sub{color:#a7a89a}
+    .actions{margin-top:12px;display:flex;gap:10px}
+    .btn{padding:10px 14px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit;cursor:pointer}
+    .btn.primary{background:#c8ff00;color:#080a06;border-color:#c8ff00;font-weight:700}
+    .form{margin-top:14px;display:grid;gap:8px}
+    input,select{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#070807;color:inherit}
+    .list{margin-top:14px;display:grid;gap:8px}
+    .item{padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);display:flex;justify-content:space-between}
+    .muted{color:#9aa08f}
+    .note{margin-top:8px;color:#a7a89a}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>Carteira</h1>
+    <div class="panel">
+      <div class="balance">
+        <div>
+          <div class="sub">Saldo disponível</div>
+          <div class="big" id="available">R$ 0,00</div>
+        </div>
+        <div style="margin-left:auto;text-align:right">
+          <div class="sub">Recebido no total</div>
+          <div id="totalReceived">R$ 0,00</div>
+          <div class="sub" style="margin-top:6px">Total solicitado</div>
+          <div id="totalRequested">R$ 0,00</div>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="openWithdrawBtn" class="btn primary">Solicitar saque</button>
+        <a class="btn" href="/dashboard.html">Voltar ao painel</a>
+      </div>
+
+      <div id="withdrawForm" class="form" style="display:none">
+        <label class="muted">Método</label>
+        <select id="method"><option value="pix">PIX</option><option value="ted">TED (transferência)</option></select>
+        <label class="muted">Valor (R$)</label>
+        <input id="amount" type="number" min="1" step="0.01" placeholder="0,00">
+
+        <div id="pixFields">
+          <label class="muted">Chave Pix</label>
+          <input id="pixKey" placeholder="e-mail, CPF, CNPJ ou celular">
+        </div>
+
+        <div id="tedFields" style="display:none">
+          <label class="muted">Banco</label>
+          <input id="bank" placeholder="Banco (ex: 001 - Banco do Brasil)">
+          <label class="muted">Agência</label>
+          <input id="agency" placeholder="0000">
+          <label class="muted">Conta</label>
+          <input id="account" placeholder="000000-0">
+          <label class="muted">Nome do titular</label>
+          <input id="holder" placeholder="Nome completo">
+        </div>
+
+        <div style="display:flex;gap:8px">
+          <button id="submitWithdraw" class="btn primary">Enviar solicitação</button>
+          <button id="cancelWithdraw" class="btn" type="button">Cancelar</button>
+        </div>
+        <div id="withdrawMsg" class="note"></div>
+      </div>
+
+      <h3 style="margin-top:18px">Solicitações de saque</h3>
+      <div id="withdrawalsList" class="list">
+        <div class="note">Carregando...</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function fmt(cents){ return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format((cents||0)/100) }
+
+    async function loadWallet(){
+      try{
+        const res = await fetch('/api/wallet')
+        if (!res.ok) throw new Error('Não autorizado')
+        const data = await res.json()
+        document.getElementById('available').textContent = fmt(data.available)
+        document.getElementById('totalReceived').textContent = fmt(data.totalReceived)
+        document.getElementById('totalRequested').textContent = fmt(data.totalRequested)
+      }catch(err){
+        document.getElementById('available').textContent = '—'
+      }
+    }
+
+    async function loadWithdrawals(){
+      const el = document.getElementById('withdrawalsList')
+      el.innerHTML = '<div class="note">Carregando...</div>'
+      try{
+        const res = await fetch('/api/withdrawals')
+        if (!res.ok) { el.innerHTML = '<div class="note">Faça login para ver solicitações.</div>'; return }
+        const data = await res.json()
+        if (!data.withdrawals || data.withdrawals.length===0){ el.innerHTML = '<div class="note">Nenhuma solicitação.</div>'; return }
+        el.innerHTML = ''
+        data.withdrawals.forEach(w=>{
+          const d = document.createElement('div')
+          d.className = 'item'
+          d.innerHTML = `<div><strong>${w.method.toUpperCase()}</strong><div class="muted">${w.createdAt.split('T')[0]}</div></div><div><strong>${fmt(w.amount)}</strong><div class="muted">${w.status}</div></div>`
+          el.appendChild(d)
+        })
+      }catch(err){ el.innerHTML = '<div class="note">Erro ao carregar.</div>' }
+    }
+
+    document.getElementById('openWithdrawBtn').addEventListener('click', ()=>{
+      const f = document.getElementById('withdrawForm')
+      f.style.display = f.style.display === 'none' ? 'block' : 'none'
+    })
+
+    const methodEl = document.getElementById('method')
+    methodEl.addEventListener('change', ()=>{
+      const m = methodEl.value
+      document.getElementById('pixFields').style.display = m==='pix'? 'block' : 'none'
+      document.getElementById('tedFields').style.display = m==='ted'? 'block' : 'none'
+    })
+
+    document.getElementById('cancelWithdraw').addEventListener('click', ()=>{
+      document.getElementById('withdrawForm').style.display='none'
+      document.getElementById('withdrawMsg').textContent=''
+    })
+
+    document.getElementById('submitWithdraw').addEventListener('click', async ()=>{
+      const amountReais = Number(document.getElementById('amount').value || 0)
+      if (!amountReais || amountReais < 1) { document.getElementById('withdrawMsg').textContent='Informe um valor mínimo de R$1,00'; return }
+      const amount = Math.round(amountReais * 100)
+      const method = document.getElementById('method').value
+      const details = {}
+      if (method==='pix') details.pixKey = document.getElementById('pixKey').value.trim()
+      else {
+        details.bank = document.getElementById('bank').value.trim()
+        details.agency = document.getElementById('agency').value.trim()
+        details.account = document.getElementById('account').value.trim()
+        details.holder = document.getElementById('holder').value.trim()
+      }
+
+      document.getElementById('submitWithdraw').disabled = true
+      document.getElementById('withdrawMsg').textContent = 'Enviando solicitação...'
+      try{
+        const res = await fetch('/api/wallet/withdraw', {
+          method: 'POST', headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ method, amount, details })
+        })
+        const data = await res.json()
+        if (!res.ok) throw new Error(data.error || 'Erro')
+        document.getElementById('withdrawMsg').textContent = 'Solicitação enviada com sucesso.'
+        document.getElementById('withdrawMsg').style.color = '#b6ff7a'
+        document.getElementById('withdrawForm').style.display='none'
+        loadWallet(); loadWithdrawals()
+      }catch(err){
+        document.getElementById('withdrawMsg').textContent = err.message || 'Erro ao enviar.'
+        document.getElementById('withdrawMsg').style.color = '#ff6b6b'
+      }finally{ document.getElementById('submitWithdraw').disabled = false }
+    })
+
+    loadWallet(); loadWithdrawals()
+  </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Completar perfil — SpaceDonate</title>
+  <style>
+    body{font-family:Inter,Arial,Helvetica,sans-serif;background:#070807;color:#f2f4ec;display:grid;place-items:center;height:100vh;padding:20px}
+    .card{width:100%;max-width:520px;background:#0b0c0a;border:1px solid rgba(255,255,255,0.04);padding:24px;border-radius:12px}
+    h1{font-family:Syne,Arial;font-size:1.4rem;margin-bottom:6px}
+    p{color:#a7a89a;margin-bottom:18px}
+    label{display:block;font-size:0.75rem;color:#9aa08f;margin-top:12px}
+    input{width:100%;padding:10px;border-radius:8px;border:1px solid #222;background:#070807;color:inherit}
+    .btn{margin-top:18px;padding:12px;border-radius:10px;border:none;background:#c8ff00;color:#080a06;font-weight:700;cursor:pointer}
+    .note{margin-top:10px;color:#9aa08f;font-size:0.9rem}
+    .error{color:#ff6b6b}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Complete seu perfil</h1>
+    <p>Falta apenas um passo: escolha um e-mail e senha para acessar sua conta com segurança.</p>
+
+    <form id="completeForm">
+      <label for="email">E-mail</label>
+      <input id="email" name="email" type="email" placeholder="seu@exemplo.com">
+
+      <label for="password">Senha (mín. 8 caracteres)</label>
+      <input id="password" name="password" type="password" placeholder="Crie uma senha segura">
+
+      <div style="display:flex;gap:12px;margin-top:14px">
+        <button id="saveBtn" class="btn" type="submit">Salvar perfil</button>
+        <button id="skipBtn" type="button" style="background:transparent;border:1px solid rgba(255,255,255,0.06);color:#d9d9d9;border-radius:10px;padding:12px;cursor:pointer">Pular por agora</button>
+      </div>
+
+      <div id="statusBox" class="note" role="status" aria-live="polite"></div>
+    </form>
+  </div>
+
+  <script>
+    async function init(){
+      const status = document.getElementById('status')
+      try {
+        const res = await fetch('/api/auth/me')
+        if (!res.ok) { location.href = '/login.html'; return }
+        const { user } = await res.json()
+        if (!user) { location.href = '/login.html'; return }
+        if (user?.email) document.getElementById('email').value = user.email
+      } catch (err) { /* ignore */ }
+
+      const statusBox = document.getElementById('statusBox')
+      const saveBtn = document.getElementById('saveBtn')
+      const skipBtn = document.getElementById('skipBtn')
+
+      document.getElementById('completeForm').addEventListener('submit', async (e)=>{
+        e.preventDefault()
+        statusBox.textContent = ''
+        statusBox.className = 'note'
+        const email = document.getElementById('email').value.trim()
+        const password = document.getElementById('password').value
+        if (!email) { statusBox.textContent = 'Informe um e-mail.'; statusBox.classList.add('error'); return }
+        saveBtn.disabled = true
+        saveBtn.textContent = 'Salvando...'
+        try {
+          const res = await fetch('/api/complete-profile', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ email, password })
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Falha ao salvar perfil.')
+          statusBox.textContent = 'Perfil atualizado com sucesso! Redirecionando...'
+          statusBox.style.color = '#b6ff7a'
+          setTimeout(()=> location.href = '/dashboard.html', 900)
+        } catch (err) {
+          statusBox.textContent = err.message || 'Erro ao salvar.'
+          statusBox.classList.add('error')
+        } finally {
+          saveBtn.disabled = false
+          saveBtn.textContent = 'Salvar perfil'
+        }
+      })
+
+      skipBtn.addEventListener('click', ()=>{
+        if (!confirm('Deseja pular este passo e ir para o painel? Você poderá completar seu perfil depois.')) return
+        // just redirect — session already created after OAuth
+        location.href = '/dashboard.html'
+      })
+    }
+    init()
+  </script>
+</body>
+</html>

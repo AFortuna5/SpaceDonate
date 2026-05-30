@@ -14,7 +14,7 @@
       --line: #27301f;
       --text: #f2f4ec;
       --muted: #878b7d;
-      --accent: #c8ff00;
+      --accent: #ae00ff;
       --cyan: #5ce1e6;
       --red: #ff4b4b;
     }
@@ -121,6 +121,42 @@
       max-width: 560px;
     }
 
+    .hero-meta {
+      margin-top: 22px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    .hero-meta span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: rgba(255,255,255,0.04);
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    .progress-shell {
+      width: 100%;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.08);
+      overflow: hidden;
+      margin-top: 12px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #c8ff00, #76e8ff);
+      transition: width 0.35s ease;
+    }
+
     .grid {
       display: grid;
       grid-template-columns: 1.2fr 0.8fr;
@@ -141,7 +177,7 @@
 
     .cards {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px;
     }
 
@@ -179,11 +215,78 @@
       gap: 12px;
     }
 
+    .obs-panel {
+      display: grid;
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(200,255,0,0.05), rgba(255,255,255,0.03));
+    }
+
+    .obs-panel strong {
+      display: block;
+      margin-bottom: 6px;
+      font-family: 'Syne', sans-serif;
+      font-size: 1rem;
+    }
+
+    .obs-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(8, 8, 8, 0.8);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.85rem;
+      color: var(--text);
+    }
+
+    .link-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
     .link-row small {
       display: block;
       color: var(--muted);
       margin-top: 5px;
       overflow-wrap: anywhere;
+    }
+
+    .feed {
+      display: grid;
+      gap: 10px;
+    }
+
+    .feed-item {
+      border: 1px solid rgba(255,255,255,0.08);
+      background: #090a08;
+      padding: 14px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+    }
+
+    .feed-item strong {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.96rem;
+      display: block;
+    }
+
+    .feed-item span,
+    .feed-item small {
+      display: block;
+      color: var(--muted);
+      line-height: 1.4;
+    }
+
+    .feed-empty {
+      color: var(--muted);
+      font-size: 0.95rem;
     }
 
     .status {
@@ -231,6 +334,12 @@
       grid-template-columns: 34px 1fr auto;
       align-items: center;
       gap: 12px;
+      transition: background 0.2s, border-color 0.2s;
+    }
+
+    .connection:hover {
+      border-color: rgba(200,255,0,0.18);
+      background: rgba(255,255,255,0.03);
     }
 
     .connection i {
@@ -251,10 +360,60 @@
     .connection[data-platform="youtube"] i { background: #ff0033; }
     .connection[data-platform="twitch"] i { background: #9146ff; }
 
-    .connection small {
-      display: block;
-      margin-top: 4px;
+    .connection-body {
+      display: grid;
+      gap: 4px;
+      min-width: 0;
+    }
+
+    .connection-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .connection-meta strong {
+      font-size: 0.95rem;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+
+    .connection-state {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
       color: var(--muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .connection-state::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: #b3b8a5;
+      display: inline-block;
+    }
+
+    .connection.connected .connection-state {
+      color: #c8ff00;
+    }
+
+    .connection.connected .connection-state::before {
+      background: #c8ff00;
+      box-shadow: 0 0 12px rgba(200,255,0,0.35);
+    }
+
+    .connection-extra {
+      color: var(--muted);
+      font-size: 0.8rem;
+      line-height: 1.4;
+      overflow-wrap: anywhere;
     }
 
     .connection.connected {
@@ -278,6 +437,7 @@
       <div class="actions">
         <a class="btn" href="/donate.html">Donate</a>
         <a class="btn" href="/overlay.html?test=true">Overlay teste</a>
+        <a class="btn" href="/wallet.html">Carteira</a>
         <button class="btn" id="logoutButton" type="button">Sair</button>
       </div>
     </div>
@@ -289,6 +449,13 @@
         <div class="status">Painel autenticado</div>
         <h1 id="title">Carregando painel...</h1>
         <p>Gerencie seus links locais, teste alertas e acompanhe a base da conta do streamer.</p>
+        <div class="hero-meta">
+          <span id="goalLabel">Meta hoje: R$ 200,00</span>
+          <span id="goalPercent">0%</span>
+        </div>
+        <div class="progress-shell">
+          <div class="progress-fill" id="goalProgress"></div>
+        </div>
       </div>
       <a class="btn primary" href="/donate.html">Abrir pagina publica</a>
     </section>
@@ -298,9 +465,11 @@
         <div class="panel">
           <h2>Resumo</h2>
           <div class="cards">
-            <div class="card"><span>Donates hoje</span><strong>R$ 0,00</strong></div>
-            <div class="card"><span>Alertas enviados</span><strong>0</strong></div>
-            <div class="card"><span>Status Pix</span><strong>Placeholder</strong></div>
+            <div class="card"><span>Donates hoje</span><strong id="statTotal">—</strong></div>
+            <div class="card"><span>Alertas enviados</span><strong id="statAlertas">—</strong></div>
+            <div class="card"><span>Quantidade hoje</span><strong id="statQtd">—</strong></div>
+            <div class="card"><span>Total de doações</span><strong id="statTotalDoacoes">—</strong></div>
+            <div class="card"><span>Meta hoje</span><strong id="statMetaHoje">R$ 0,00</strong></div>
           </div>
         </div>
 
@@ -309,21 +478,61 @@
           <div class="links">
             <div class="link-row">
               <div><strong>Pagina de donate</strong><small id="donateUrl"></small></div>
-              <a class="btn" href="/donate.html">Abrir</a>
+              <div class="link-actions">
+                <button class="btn" id="copyDonateBtn" type="button">Copiar</button>
+                <a class="btn" href="/donate.html">Abrir</a>
+              </div>
             </div>
             <div class="link-row">
               <div><strong>Overlay OBS</strong><small id="overlayUrl"></small></div>
-              <a class="btn" href="/overlay.html?test=true">Testar</a>
+              <div class="link-actions">
+                <button class="btn" id="copyOverlayBtn" type="button">Copiar</button>
+                <a class="btn" href="/overlay.html?test=true">Testar</a>
+              </div>
             </div>
+          </div>
+        </div>
+
+        <div class="panel obs-panel">
+          <strong>OBS pronto</strong>
+          <span class="obs-chip">Browser Source</span>
+          <span class="obs-chip">1920×1080</span>
+          <span class="obs-chip">Transparência automática</span>
+          <p style="color: var(--muted); line-height: 1.6; margin: 0;">Abra o OBS, adicione uma fonte do tipo Browser e cole o link do overlay. Use a versão de teste para validar o posicionamento antes da live.</p>
+        </div>
+
+        <div class="panel">
+          <h2>Atividade na live</h2>
+          <div class="feed" id="recentFeed">
+            <div class="feed-empty">Nenhum alerta recente. Teste o overlay ou envie um donate para ver aqui.</div>
           </div>
         </div>
       </div>
 
       <aside class="panel">
         <h2>Conta</h2>
-        <div class="profile-line"><span>Canal</span><strong id="creatorName">...</strong></div>
-        <div class="profile-line"><span>E-mail</span><strong id="email">...</strong></div>
-        <div class="profile-line"><span>Criada em</span><strong id="createdAt">...</strong></div>
+          <div class="profile-line"><span>Canal</span><strong id="creatorName">...</strong></div>
+          <div class="profile-line"><span>E-mail</span><strong id="email">...</strong></div>
+          <div class="profile-line"><span>Criada em</span><strong id="createdAt">...</strong></div>
+
+          <div style="margin-top:12px; display:flex; gap:8px; align-items:center">
+            <button id="editProfileBtn" class="btn" type="button">Editar perfil</button>
+            <span style="color:var(--muted); font-size:0.9rem">Atualize e-mail ou senha</span>
+          </div>
+
+          <form id="profileForm" style="display:none; margin-top:14px; gap:8px">
+            <label style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">E-mail</label>
+            <input id="profileEmailInput" type="email" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#070807;color:inherit">
+
+            <label style="font-size:0.78rem;color:var(--muted);margin-bottom:6px">Nova senha (opcional)</label>
+            <input id="profilePasswordInput" type="password" placeholder="Deixe em branco para não alterar" style="padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:#070807;color:inherit">
+
+            <div style="display:flex;gap:8px;margin-top:8px">
+              <button id="profileSaveBtn" class="btn primary" type="button">Salvar</button>
+              <button id="profileCancelBtn" class="btn" type="button">Cancelar</button>
+            </div>
+            <div id="profileMsg" style="margin-top:8px;color:var(--muted);font-size:0.9rem"></div>
+          </form>
       </aside>
 
       <aside class="panel">
@@ -333,15 +542,27 @@
             <i aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.6 12 3.6 12 3.6s-7.5 0-9.4.5A3 3 0 0 0 .5 6.2 31.2 31.2 0 0 0 0 12a31.2 31.2 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.5 9.4.5 9.4.5s7.5 0 9.4-.5a3 3 0 0 0 2.1-2.1A31.2 31.2 0 0 0 24 12a31.2 31.2 0 0 0-.5-5.8ZM9.6 15.6V8.4L15.8 12l-6.2 3.6Z"/></svg>
             </i>
-            <div><strong>YouTube</strong><small>Não conectado</small></div>
-            <a class="btn" href="/auth/youtube">Conectar</a>
+            <div class="connection-body">
+              <div class="connection-meta">
+                <strong>YouTube</strong>
+                <span class="connection-state">Não conectado</span>
+              </div>
+              <small class="connection-extra">Conecte seu canal para liberar alertas e estatísticas.</small>
+            </div>
+            <button class="btn connection-action" type="button" data-provider="youtube">Conectar</button>
           </div>
           <div class="connection" data-platform="twitch">
             <i aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false"><path d="M4.4 2 3 5.8v14h4.8V22h2.7l2.2-2.2h3.6L21 15.1V2H4.4Zm14.3 12-2.7 2.7h-4.1l-2.2 2.2v-2.2H6.2V4.3h12.5V14Zm-2.2-6.3v4.9h-2.2V7.7h2.2Zm-5.8 0v4.9H8.5V7.7h2.2Z"/></svg>
             </i>
-            <div><strong>Twitch</strong><small>Não conectado</small></div>
-            <a class="btn" href="/auth/twitch">Conectar</a>
+            <div class="connection-body">
+              <div class="connection-meta">
+                <strong>Twitch</strong>
+                <span class="connection-state">Não conectado</span>
+              </div>
+              <small class="connection-extra">Conecte seu canal para liberar alertas e estatísticas.</small>
+            </div>
+            <button class="btn connection-action" type="button" data-provider="twitch">Conectar</button>
           </div>
         </div>
       </aside>
@@ -356,10 +577,90 @@
         return
       }
       const { user } = await res.json()
+      if (!user) {
+        window.location.href = '/login.html?auth=login_required'
+        return
+      }
       document.getElementById('title').textContent = 'Bem-vindo, ' + user.creatorName
       document.getElementById('creatorName').textContent = user.creatorName
       document.getElementById('email').textContent = user.email
       document.getElementById('createdAt').textContent = new Date(user.createdAt).toLocaleDateString('pt-BR')
+    }
+
+    async function loadStats() {
+      try {
+        const res = await fetch('/api/stats')
+        if (!res.ok) return
+        const data = await res.json()
+
+        animateValue('statTotal',    data.totalHojeFormatado)
+        animateValue('statAlertas',  String(data.alertasEnviados))
+        animateValue('statQtd',      data.quantidadeHoje + (data.quantidadeHoje === 1 ? ' donate' : ' donates'))
+        animateValue('statTotalDoacoes', String(data.totalDoacoes))
+        animateValue('statMetaHoje', data.metaHojeFormatado)
+        document.getElementById('goalLabel').textContent = 'Meta hoje: ' + data.metaHojeFormatado
+        document.getElementById('goalPercent').textContent = data.metaPercent + '%'
+        document.getElementById('goalProgress').style.width = data.metaPercent + '%'
+      } catch {
+        // silencioso — não travar a página se a API falhar
+      }
+    }
+
+    async function loadRecentAlerts() {
+      try {
+        const res = await fetch('/api/recent-alerts')
+        if (!res.ok) return
+        const data = await res.json()
+        const feed = document.getElementById('recentFeed')
+        if (!feed) return
+
+        feed.innerHTML = ''
+        if (!Array.isArray(data.alerts) || data.alerts.length === 0) {
+          feed.innerHTML = '<div class="feed-empty">Nenhum alerta recente. Teste o overlay ou envie um donate para ver aqui.</div>'
+          return
+        }
+
+        for (const alert of data.alerts) {
+          const item = document.createElement('div')
+          item.className = 'feed-item'
+          item.innerHTML = `
+            <div>
+              <strong>${esc(alert.name)}</strong>
+              <span>${esc(alert.message || 'Sem mensagem')}</span>
+            </div>
+            <div>
+              <strong>${formatCurrency(alert.amount)}</strong>
+              <small>${new Date(alert.createdAt).toLocaleTimeString('pt-BR')}</small>
+            </div>
+          `
+          feed.appendChild(item)
+        }
+      } catch {
+        // não travar se a API falhar
+      }
+    }
+
+    function formatCurrency(cents) {
+      return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(cents / 100)
+    }
+
+    function esc(text) {
+      return String(text)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+    }
+
+    function animateValue(id, newValue) {
+      const el = document.getElementById(id)
+      if (!el || el.textContent === newValue) return
+      el.style.transition = 'opacity 0.2s'
+      el.style.opacity = '0'
+      setTimeout(() => {
+        el.textContent = newValue
+        el.style.opacity = '1'
+      }, 200)
     }
 
     async function loadConnections() {
@@ -372,15 +673,78 @@
       document.querySelectorAll('.connection').forEach(card => {
         const platform = card.dataset.platform
         const info = data[platform]
-        if (!info?.connected) return
+        const state = card.querySelector('.connection-state')
+        const extra = card.querySelector('.connection-extra')
+        const action = card.querySelector('.btn')
+        if (!info?.connected) {
+          card.classList.remove('connected')
+          state.textContent = 'Não conectado'
+          extra.textContent = 'Conecte seu canal para liberar alertas e estatísticas.'
+          action.textContent = 'Conectar'
+          return
+        }
         card.classList.add('connected')
-        card.querySelector('small').textContent = info.displayName || 'Conectado'
-        card.querySelector('.btn').textContent = 'Reconectar'
+        state.textContent = info.displayName ? `Conectado como ${info.displayName}` : 'Conectado'
+        extra.textContent = info.login ? `@${info.login}` : 'Canal conectado'
+        action.textContent = 'Reconectar'
       })
     }
 
     document.getElementById('donateUrl').textContent = location.origin + '/donate.html'
     document.getElementById('overlayUrl').textContent = location.origin + '/overlay.html'
+
+    document.querySelectorAll('.connection-action').forEach(button => {
+      button.addEventListener('click', async () => {
+        const provider = button.dataset.provider
+        const card = button.closest('.connection')
+        const connected = card.classList.contains('connected')
+
+        if (!connected) {
+          window.location.href = `/auth/${provider}`
+          return
+        }
+
+        const confirmed = confirm(`Deseja desconectar ${provider === 'youtube' ? 'YouTube' : 'Twitch'}?`)
+        if (!confirmed) return
+
+        button.disabled = true
+        button.textContent = 'Desconectando...'
+
+        try {
+          const res = await fetch('/api/connections/disconnect', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ provider })
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Falha ao desconectar.')
+          await loadConnections()
+          button.textContent = 'Conectar'
+        } catch (err) {
+          alert(err.message)
+          button.disabled = false
+          button.textContent = 'Desconectar'
+        }
+      })
+    })
+
+    document.getElementById('copyDonateBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(location.origin + '/donate.html')
+        alert('URL da página de donate copiada!')
+      } catch {
+        alert('Não foi possível copiar o link. Tente novamente.')
+      }
+    })
+
+    document.getElementById('copyOverlayBtn').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(location.origin + '/overlay.html')
+        alert('URL do overlay copiada!')
+      } catch {
+        alert('Não foi possível copiar o link. Tente novamente.')
+      }
+    })
 
     document.getElementById('logoutButton').addEventListener('click', async () => {
       await fetch('/api/auth/logout', { method: 'POST' })
@@ -389,6 +753,90 @@
 
     loadUser()
     loadConnections()
+    loadStats()
+    loadRecentAlerts()
+
+    // Atualiza stats a cada 30 segundos automaticamente
+    setInterval(loadStats, 30_000)
+
+    // Conecta SSE para atualizações em tempo real (doações)
+    (function(){
+      const es = new EventSource('/api/alerts/stream')
+      es.onmessage = (e) => {
+        try {
+          const d = JSON.parse(e.data)
+          if (d.type === 'donation') {
+            // atualiza feed
+            const feed = document.getElementById('recentFeed')
+            const item = document.createElement('div')
+            item.className = 'feed-item'
+            item.innerHTML = `
+              <div>
+                <strong>${esc(d.name)}</strong>
+                <span>${esc(d.message || 'Sem mensagem')}</span>
+              </div>
+              <div>
+                <strong>${formatCurrency(d.amount)}</strong>
+                <small>${new Date(d.createdAt || Date.now()).toLocaleTimeString('pt-BR')}</small>
+              </div>`
+            feed.prepend(item)
+
+            // incrementa alertas e atualiza barra (simples incremento local)
+            const alertsEl = document.getElementById('statAlertas')
+            alertsEl.textContent = String(Number(alertsEl.textContent || 0) + 1)
+            // recarrega estatísticas para manter consistência
+            loadStats()
+          }
+        } catch (err) { /* ignore parse errors */ }
+      }
+    })()
+
+    // Profile edit handlers
+    (function(){
+      const editBtn = document.getElementById('editProfileBtn')
+      const form = document.getElementById('profileForm')
+      const saveBtn = document.getElementById('profileSaveBtn')
+      const cancelBtn = document.getElementById('profileCancelBtn')
+      const msg = document.getElementById('profileMsg')
+
+      editBtn?.addEventListener('click', () => {
+        form.style.display = form.style.display === 'none' ? 'block' : 'none'
+        // prefill email if available
+        fetch('/api/auth/me').then(r=>r.ok? r.json() : null).then(d=>{
+          if (d?.user?.email) document.getElementById('profileEmailInput').value = d.user.email
+        }).catch(()=>{})
+      })
+
+      cancelBtn?.addEventListener('click', ()=>{ form.style.display='none'; msg.textContent = '' })
+
+      saveBtn?.addEventListener('click', async ()=>{
+        msg.textContent = ''
+        const email = document.getElementById('profileEmailInput').value.trim()
+        const password = document.getElementById('profilePasswordInput').value
+        if (!email) { msg.textContent = 'Informe um e-mail válido.'; return }
+        saveBtn.disabled = true
+        saveBtn.textContent = 'Salvando...'
+        try {
+          const res = await fetch('/api/complete-profile', {
+            method: 'POST', headers: {'Content-Type':'application/json'},
+            body: JSON.stringify({ email, password })
+          })
+          const data = await res.json()
+          if (!res.ok) throw new Error(data.error || 'Falha ao salvar.')
+          msg.style.color = 'var(--accent)'
+          msg.textContent = 'Perfil atualizado.'
+          document.getElementById('email').textContent = email
+          document.getElementById('profilePasswordInput').value = ''
+          setTimeout(()=>{ form.style.display='none'; msg.textContent = '' }, 900)
+        } catch (err) {
+          msg.style.color = 'var(--red)'
+          msg.textContent = err.message || 'Erro ao salvar.'
+        } finally {
+          saveBtn.disabled = false
+          saveBtn.textContent = 'Salvar'
+        }
+      })
+    })()
   </script>
 </body>
 </html>

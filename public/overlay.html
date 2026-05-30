@@ -118,6 +118,20 @@
     flex-wrap: wrap;
   }
 
+  .alert-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background: rgba(200,255,0,0.12);
+    color: #d9ffd5;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
   .alert-name {
     font-family: 'Syne', sans-serif;
     font-size: 1.1rem;
@@ -201,6 +215,51 @@
   .status-dot.connected { background: #c8ff00; box-shadow: 0 0 6px #c8ff00; }
   .status-dot.error     { background: #ff4d4d; }
 
+  .brand-badge {
+    position: fixed;
+    right: 16px;
+    bottom: 16px;
+    color: rgba(255,255,255,0.45);
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  .overlay-badge {
+    position: fixed;
+    left: 16px;
+    top: 16px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 999px;
+    background: rgba(8, 8, 8, 0.78);
+    border: 1px solid rgba(200,255,0,0.16);
+    color: #f4f7ea;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.78rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    pointer-events: none;
+  }
+
+  .overlay-badge strong {
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #c8ff00;
+  }
+
+  .overlay-badge span {
+    opacity: 0.75;
+  }
+
+  .overlay-badge.test-mode {
+    box-shadow: 0 0 24px rgba(200,255,0,0.14);
+  }
+
   /* ── Particles ────────────────────────────────────────────── */
   @keyframes particle-fly {
     0%   { transform: translate(0, 0) scale(1); opacity: 1; }
@@ -236,8 +295,11 @@
   <span id="statusText">conectando</span>
 </div>
 
+<div class="overlay-badge" id="overlayBadge"><span>Live alert</span><strong>SpaceDonate</strong></div>
+
 <!-- Alerts injected here -->
 <div id="alert-container"></div>
+<div class="brand-badge">SpaceDonate</div>
 
 <script>
   // ══════════════════════════════════════════════════════════
@@ -272,6 +334,8 @@
     const reais = (cents / 100).toFixed(2).replace('.', ',')
     const emoji = pickEmoji(cents / 100)
 
+    const verb = pickVerb(cents / 100)
+    const tag = pickTag(cents / 100)
     const card = document.createElement('div')
     card.className = 'alert-card'
     card.innerHTML = `
@@ -283,12 +347,11 @@
       <div class="alert-body">
         <div class="alert-top">
           <span class="alert-name">${esc(donation.name)}</span>
-          <span class="alert-verb">doou</span>
+          <span class="alert-verb">${esc(verb)}</span>
           <span class="alert-amount">R$&nbsp;${reais}</span>
         </div>
-        ${donation.message
-          ? `<div class="alert-message">${esc(donation.message)}</div>`
-          : ''}
+        <div class="alert-tag">${esc(tag)}</div>
+        <div class="alert-message">${esc(donation.message || 'Sua energia fez a live brilhar!')}</div>
       </div>
       <div class="progress-track">
         <div class="progress-fill" id="pf-${Date.now()}"></div>
@@ -367,9 +430,10 @@
     if (!('speechSynthesis' in window)) return
     speechSynthesis.cancel()
     const r = Math.round(donation.amount / 100)
+    const verb = pickVerb(r)
     const txt = donation.message
-      ? `${donation.name} doou ${r} reais e disse: ${donation.message}`
-      : `${donation.name} fez um donate de ${r} reais!`
+      ? `${donation.name} ${verb} de ${r} reais e disse: ${donation.message}`
+      : `${donation.name} ${verb} de ${r} reais!`
     const u = new SpeechSynthesisUtterance(txt)
     const pt = voices.find(v => v.lang.startsWith('pt'))
     if (pt) u.voice = pt
@@ -377,12 +441,32 @@
     speechSynthesis.speak(u)
   }
 
+  function pickVerb(amount) {
+    const phrases = [
+      'mandou apoio',
+      'acendeu a live',
+      'turbinaram a missão',
+      'explodiu o chat',
+      'doou'
+    ]
+    return phrases[Math.min(Math.floor(amount / 20), phrases.length - 1)]
+  }
+
+  function pickTag(amount) {
+    if (amount >= 150) return 'Ultrapassou a meta'
+    if (amount >= 80) return 'Grande apoio'
+    if (amount >= 20) return 'Ajuda poderosa'
+    return 'Apoio direto'
+  }
+
   // ══════════════════════════════════════════════════════════
   // SSE
   // ══════════════════════════════════════════════════════════
   const dot  = document.getElementById('statusDot')
   const txt  = document.getElementById('statusText')
+  const overlayBadge = document.getElementById('overlayBadge')
   let once = false
+  let isTestMode = false
 
   function connect() {
     const es = new EventSource('/api/alerts/stream')
@@ -390,14 +474,14 @@
     es.onopen = () => {
       once = true
       dot.className = 'status-dot connected'
-      txt.textContent = 'conectado'
+      txt.textContent = isTestMode ? 'teste ativo' : 'conectado'
     }
 
     es.onmessage = (e) => {
       const d = JSON.parse(e.data)
       if (d.type === 'connected') {
         dot.className = 'status-dot connected'
-        txt.textContent = 'placeholder'
+        txt.textContent = isTestMode ? 'teste ativo' : 'placeholder'
       }
       if (d.type === 'donation' || d.type === 'test') enqueue(d)
     }
@@ -418,6 +502,11 @@
   // ══════════════════════════════════════════════════════════
   const p = new URLSearchParams(location.search)
   if (p.get('test') === 'true') {
+    isTestMode = true
+    overlayBadge.querySelector('span').textContent = 'Modo de teste'
+    txt.textContent = 'teste ativo'
+    overlayBadge.classList.add('test-mode')
+
     setTimeout(() => enqueue({
       type: 'test', name: 'GamerXP_BR',
       amount: 5000, message: 'Conteúdo incrível! Continua assim gg 🔥'
