@@ -286,8 +286,9 @@
   .corner-bl { bottom: 6px; left: 6px;  border-width: 0 0 1px 1px; }
   .corner-br { bottom: 6px; right: 6px; border-width: 0 1px 1px 0; }
 </style>
+<link rel="stylesheet" href="/space-theme.css">
 </head>
-<body>
+<body class="obs-overlay">
 
 <!-- Dev status pill -->
 <div id="status">
@@ -388,7 +389,7 @@
   }
 
   function particles(card) {
-    const colors = ['#c8ff00', '#ffffff', '#a0ff00', '#e0ff80']
+    const colors = ['#8b5cf6', '#ffffff', '#c4b5fd', '#f0abfc']
     for (let i = 0; i < 10; i++) {
       const p = document.createElement('div')
       p.className = 'particle'

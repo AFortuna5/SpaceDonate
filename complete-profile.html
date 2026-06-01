@@ -15,6 +15,7 @@
     .note{margin-top:10px;color:#9aa08f;font-size:0.9rem}
     .error{color:#ff6b6b}
   </style>
+  <link rel="stylesheet" href="/space-theme.css">
 </head>
 <body>
   <div class="card">
@@ -69,7 +70,7 @@
           const data = await res.json()
           if (!res.ok) throw new Error(data.error || 'Falha ao salvar perfil.')
           statusBox.textContent = 'Perfil atualizado com sucesso! Redirecionando...'
-          statusBox.style.color = '#b6ff7a'
+          statusBox.style.color = '#c4b5fd'
           setTimeout(()=> location.href = '/dashboard.html', 900)
         } catch (err) {
           statusBox.textContent = err.message || 'Erro ao salvar.'

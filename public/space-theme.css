@@ -1,0 +1,314 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@300;400;600;700;800&display=swap');
+
+:root {
+  --bg: #050306;
+  --ink: #ffffff;
+  --text: #ffffff;
+  --muted: #9ca3af;
+  --muted2: #6b7280;
+  --surface: #0f0f13;
+  --panel: #0f0f13;
+  --panel2: #15131c;
+  --line: #1f1f28;
+  --border: #1f1f28;
+  --border2: #2b2b34;
+  --purple: #7c3aed;
+  --lilac: #c4b5fd;
+  --accent: #8b5cf6;
+  --accent2: rgba(139, 92, 246, 0.12);
+  --accent3: rgba(196, 181, 253, 0.18);
+  --cyan: #a78bfa;
+  --pink: #f0abfc;
+  --red: #ff4b4b;
+  --green: #22c55e;
+  --shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+}
+
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+body:not(.obs-overlay) {
+  min-height: 100dvh;
+  background:
+    radial-gradient(circle at 12% 16%, rgba(124, 58, 237, 0.1), transparent 26%),
+    radial-gradient(circle at 82% 8%, rgba(139, 92, 246, 0.08), transparent 24%),
+    radial-gradient(circle at 70% 86%, rgba(240, 171, 252, 0.055), transparent 28%),
+    linear-gradient(180deg, #07060a 0%, #050306 48%, #0a0a0d 100%) !important;
+  color: var(--ink) !important;
+  font-family: 'Inter', 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif !important;
+}
+
+body:not(.obs-overlay)::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: 48px 48px;
+  mask-image: linear-gradient(to bottom, black, transparent 78%);
+}
+
+body:not(.obs-overlay) > * {
+  position: relative;
+  z-index: 1;
+}
+
+a {
+  color: inherit;
+}
+
+header,
+.page-top {
+  background: rgba(7, 6, 10, 0.76) !important;
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  backdrop-filter: blur(18px);
+}
+
+.brand,
+.brand-row strong,
+.logo,
+h1,
+h2,
+h3,
+.headline,
+.form-title,
+.share-title {
+  color: var(--ink) !important;
+}
+
+.logo,
+.brand,
+.headline,
+h1,
+h2,
+h3 {
+  font-family: 'Poppins', 'Syne', system-ui, sans-serif !important;
+  letter-spacing: 0 !important;
+}
+
+.mark,
+.brand-mark,
+.mini-mark,
+.alert-avatar {
+  background: linear-gradient(135deg, var(--purple), var(--accent)) !important;
+  color: #fff !important;
+  border-color: rgba(196, 181, 253, 0.35) !important;
+  box-shadow: 0 14px 36px rgba(124, 58, 237, 0.22);
+}
+
+.card,
+.panel,
+.auth-card,
+main,
+.left,
+.right,
+.feature,
+.step,
+.metric,
+.side-box,
+.share-panel,
+.obs-instructions,
+.link-row,
+.connection,
+.profile-line,
+.item {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
+    rgba(15, 15, 19, 0.9) !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  box-shadow: 0 26px 70px rgba(0, 0, 0, 0.28);
+}
+
+.left,
+.right {
+  box-shadow: none;
+}
+
+.card,
+.panel,
+main,
+.auth-card,
+.product-shot,
+.share-panel,
+.obs-instructions,
+.page-top {
+  border-radius: 12px !important;
+}
+
+.card,
+.panel,
+.auth-card {
+  overflow: hidden;
+}
+
+.panel h2,
+.form-title,
+.share-title {
+  color: var(--lilac) !important;
+}
+
+p,
+small,
+label,
+.sub,
+.muted,
+.footer-note,
+.stat-label,
+.profile-line span,
+.card span,
+.link-row small,
+.connection small,
+.share-panel p,
+.obs-instructions p,
+.pix-note,
+.status,
+.brand-row small {
+  color: var(--muted) !important;
+}
+
+.headline em,
+.big,
+.stat-num,
+.card strong,
+.profile-line strong,
+.status::before {
+  color: var(--lilac) !important;
+}
+
+.btn,
+.copy-btn,
+.oauth-btn,
+.preset-btn,
+button,
+input,
+textarea,
+select {
+  border-color: var(--border2) !important;
+  border-radius: 8px !important;
+}
+
+.btn,
+.copy-btn,
+.oauth-btn,
+.preset-btn,
+button:not(.btn-primary):not(.submit-btn),
+input,
+textarea,
+select,
+.tab {
+  background: rgba(10, 9, 14, 0.86) !important;
+  color: var(--ink) !important;
+}
+
+input,
+textarea,
+select {
+  border: 1px solid var(--border2) !important;
+  outline: none;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18) !important;
+}
+
+.btn.primary,
+.btn-primary,
+.submit-btn,
+.primary,
+.tab.active,
+.preset-btn.active {
+  background: linear-gradient(135deg, var(--purple), var(--accent)) !important;
+  border-color: var(--accent) !important;
+  color: #fff !important;
+  font-weight: 800 !important;
+  box-shadow: 0 18px 48px rgba(124, 58, 237, 0.24);
+}
+
+.btn:hover,
+.copy-btn:hover,
+.oauth-btn:hover,
+.preset-btn:hover {
+  border-color: var(--accent) !important;
+  color: var(--lilac) !important;
+  transform: translateY(-1px);
+}
+
+.divider-line,
+.tabs,
+.pix-result,
+.connect-panel {
+  border-color: rgba(255, 255, 255, 0.08) !important;
+  background-color: rgba(255, 255, 255, 0.025) !important;
+}
+
+.badge {
+  border-color: rgba(196, 181, 253, 0.25) !important;
+  color: var(--lilac) !important;
+  background: rgba(139, 92, 246, 0.08) !important;
+}
+
+.badge-dot,
+.status-dot.connected {
+  background: var(--accent) !important;
+  box-shadow: 0 0 12px rgba(139, 92, 246, 0.8) !important;
+}
+
+.preset-btn.active,
+.connection.connected,
+.connect.connected {
+  background: rgba(139, 92, 246, 0.12) !important;
+  border-color: rgba(196, 181, 253, 0.55) !important;
+}
+
+.pix-code-text {
+  background: rgba(5, 3, 6, 0.88) !important;
+  border-color: var(--border2) !important;
+}
+
+.toast {
+  background: rgba(15, 15, 19, 0.96) !important;
+  border-color: rgba(196, 181, 253, 0.25) !important;
+  color: var(--ink) !important;
+  box-shadow: var(--shadow);
+}
+
+.obs-overlay .alert-card {
+  background: rgba(8, 7, 13, 0.94) !important;
+  border-color: rgba(196, 181, 253, 0.3) !important;
+  border-left-color: var(--accent) !important;
+  box-shadow: 0 24px 70px rgba(124, 58, 237, 0.28);
+}
+
+.obs-overlay .alert-card::after {
+  background: linear-gradient(90deg, transparent, rgba(196, 181, 253, 0.14), transparent) !important;
+}
+
+.obs-overlay .alert-tag,
+.obs-overlay .overlay-badge {
+  background: rgba(139, 92, 246, 0.16) !important;
+  border-color: rgba(196, 181, 253, 0.28) !important;
+  color: var(--lilac) !important;
+}
+
+.obs-overlay .alert-amount,
+.obs-overlay .overlay-badge strong {
+  color: var(--lilac) !important;
+  text-shadow: 0 0 24px rgba(196, 181, 253, 0.55) !important;
+}
+
+.obs-overlay .progress-track {
+  background: rgba(139, 92, 246, 0.12) !important;
+}
+
+.obs-overlay .progress-fill {
+  background: linear-gradient(90deg, var(--purple), var(--lilac)) !important;
+  box-shadow: 0 0 12px rgba(196, 181, 253, 0.65) !important;
+}
