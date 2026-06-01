@@ -132,13 +132,13 @@
       align-items: center;
       justify-content: center;
       gap: 32px;
-      padding: 48px 0 56px;
+      padding: 48px 20px 56px;
       text-align: center;
     }
 
     .hero > div:first-child {
-      width: 100%;
-      max-width: 780px;
+      width: min(840px,100%);
+      max-width: 840px;
     }
 
     /* eyebrow removed visually */
@@ -241,9 +241,43 @@
       transition: transform .22s cubic-bezier(.2,.9,.2,1), box-shadow .22s ease;
     }
     .cta-primary:hover { transform: translateY(-6px) scale(1.01); box-shadow: 0 28px 80px rgba(124,58,237,0.28); }
-    .cta-badge { background: rgba(255,255,255,0.06); color: var(--lilac); padding:6px 10px; border-radius:999px; font-size:0.78rem; font-weight:600; }
     .cta-title { font-family: 'Poppins', sans-serif; font-weight:700; font-size:1.35rem; color: #fff; }
-    .cta-brief { color: rgba(255,255,255,0.92); font-size:0.94rem; opacity:0.95 }
+    .cta-brief { color: rgba(255,255,255,0.96); font-size:0.94rem; opacity:0.98; }
+    .cta-primary { position: relative; overflow: hidden; }
+    .cta-primary::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 20% 20%, rgba(255,255,255,0.16), transparent 40%);
+      opacity: 0;
+      transition: opacity .45s ease;
+      pointer-events: none;
+    }
+    .cta-primary:hover::before { opacity: 1; }
+    .cta-primary::after {
+      content: '';
+      position: absolute;
+      top: -20px;
+      right: -20px;
+      width: 130px;
+      height: 130px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.16);
+      opacity: 0.22;
+      filter: blur(2px);
+      pointer-events: none;
+    }
+    .hero-actions { justify-content: center; }
+    .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; align-items: center; justify-content: center; }
+    .hero-actions .btn.ghost { min-height: 56px; padding: 0 20px; }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity .75s ease, transform .75s cubic-bezier(.16,.72,.23,1); will-change: transform, opacity; }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+    .hero .reveal { transition-delay: 0.1s; }
+    .section .reveal { transition-delay: 0.08s; }
+    .feature.reveal, .step.reveal { transform: translateY(32px); }
+    .section .reveal.visible { transition-delay: 0s; }
+    .hero-actions a, .trust-row .metric, .side-box, .feature, .step, .cta-box, footer .footer-inner { transform-style: preserve-3d; }
     #spaceCanvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; display: block; }
 
     .hero-notes {
@@ -831,35 +865,56 @@
       }
     })()
   </script>
+  <script>
+    (function(){
+      function initReveal() {
+        const targets = document.querySelectorAll('.reveal');
+        if (!targets.length) return;
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('visible');
+              observer.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.18, rootMargin: '0px 0px -80px 0px' });
+        targets.forEach(el => observer.observe(el));
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initReveal);
+      } else {
+        initReveal();
+      }
+    })();
+  </script>
     <section class="wrap hero">
-      <div>
+      <div class="reveal">
         <div class="eyebrow">Pix, alertas e widgets para streamers</div>
         <h1>Receba doações com overlay animado e alertas em tempo real.<span>Controle sua live sem perder o foco.</span></h1>
         <p class="lead">
           SpaceDonate combina página de apoio, overlay transparente e alertas rápidos para transmissões mais envolventes.
         </p>
-        <div class="hero-actions">
+        <div class="hero-actions reveal">
           <div class="hero-cta">
             <a class="btn primary cta-primary" href="/login.html?tab=signup">
-              <span class="cta-badge">Feito com carinho</span>
               <span class="cta-title">Comece sua conta grátis</span>
               <span class="cta-brief">Receba via PIX • Overlay pronto • Alertas leves</span>
             </a>
             <a class="btn ghost" href="/donate.html">Ver página de donate</a>
           </div>
         </div>
-        <div class="hero-notes">
+        <div class="hero-notes reveal">
           <span>OBS / Browser Source pronto</span>
           <span>Alertas leves e responsivos</span>
           <span>Design moderno e mobile-first</span>
         </div>
-        <div class="trust-row">
+        <div class="trust-row reveal">
           <div class="metric"><strong>2%</strong><span>taxa planejada no Pix</span></div>
           <div class="metric"><strong>OBS</strong><span>overlay transparente pronto</span></div>
           <div class="metric"><strong>Fast</strong><span>configuração rápida e intuitiva</span></div>
         </div>
 
-        <div class="product-shot" aria-label="Previa do painel SpaceDonate">
+        <div class="product-shot reveal" aria-label="Previa do painel SpaceDonate">
           <div class="shot-top">
             <div class="dots"><b></b><b></b><b></b></div>
             <span>dashboard.spacedonate.local</span>
@@ -882,7 +937,7 @@
         </div>
       </div>
 
-      <aside class="auth-card" id="acesso" aria-label="Acesso SpaceDonate">
+      <aside class="auth-card reveal" id="acesso" aria-label="Acesso SpaceDonate">
         <div class="auth-head">
           <div>
             <h2>Entrar na conta</h2>
@@ -903,29 +958,29 @@
 
     <section class="section" id="recursos">
       <div class="wrap">
-        <div class="section-head">
+        <div class="section-head reveal">
           <h2>Ferramentas para transformar apoio em show.</h2>
           <p>Inspirado no que streamers usam todos os dias, com identidade propria e foco em uma configuracao rapida.</p>
         </div>
         <div class="feature-grid">
-          <article class="feature"><i>01</i><div><h3>Pagina de donate</h3><p>Um link simples para receber apoio com valor, nome e mensagem do viewer.</p></div></article>
-          <article class="feature"><i>02</i><div><h3>Overlay OBS</h3><p>Alertas transparentes, animados e prontos para encaixar na cena da live.</p></div></article>
-          <article class="feature"><i>03</i><div><h3>Leitura de voz</h3><p>Mensagens podem virar audio no navegador para dar mais presenca ao chat.</p></div></article>
-          <article class="feature"><i>04</i><div><h3>Metas e QR code</h3><p>Mostre progresso, atalhos de pagamento e chamadas para sua comunidade.</p></div></article>
+          <article class="feature reveal"><i>01</i><div><h3>Pagina de donate</h3><p>Um link simples para receber apoio com valor, nome e mensagem do viewer.</p></div></article>
+          <article class="feature reveal"><i>02</i><div><h3>Overlay OBS</h3><p>Alertas transparentes, animados e prontos para encaixar na cena da live.</p></div></article>
+          <article class="feature reveal"><i>03</i><div><h3>Leitura de voz</h3><p>Mensagens podem virar audio no navegador para dar mais presenca ao chat.</p></div></article>
+          <article class="feature reveal"><i>04</i><div><h3>Metas e QR code</h3><p>Mostre progresso, atalhos de pagamento e chamadas para sua comunidade.</p></div></article>
         </div>
       </div>
     </section>
 
     <section class="section" id="como-funciona">
       <div class="wrap">
-        <div class="section-head">
+        <div class="section-head reveal">
           <h2>Da conta criada ao alerta na tela.</h2>
           <p>O fluxo foi desenhado para ser claro: conectar canais, publicar pagina e adicionar o overlay.</p>
         </div>
         <div class="steps">
-          <article class="step"><b>PASSO 1</b><h3>Crie seu espaco</h3><p>Escolha o nome do canal e acesse o painel para configurar valores, mensagens e visual.</p></article>
-          <article class="step"><b>PASSO 2</b><h3>Conecte YouTube e Twitch</h3><p>Autorize os canais para manter sua identidade, links e proximas integracoes no mesmo lugar.</p></article>
-          <article class="step"><b>PASSO 3</b><h3>Adicione ao OBS</h3><p>Use o overlay como Browser Source em 1920×1080, deixe transparente e veja os alertas em tempo real na live.</p></article>
+          <article class="step reveal"><b>PASSO 1</b><h3>Crie seu espaco</h3><p>Escolha o nome do canal e acesse o painel para configurar valores, mensagens e visual.</p></article>
+          <article class="step reveal"><b>PASSO 2</b><h3>Conecte YouTube e Twitch</h3><p>Autorize os canais para manter sua identidade, links e proximas integracoes no mesmo lugar.</p></article>
+          <article class="step reveal"><b>PASSO 3</b><h3>Adicione ao OBS</h3><p>Use o overlay como Browser Source em 1920×1080, deixe transparente e veja os alertas em tempo real na live.</p></article>
         </div>
       </div>
     </section>
@@ -942,7 +997,7 @@
   </main>
 
   <footer>
-    <div class="wrap footer-inner">
+    <div class="wrap footer-inner reveal">
       <span>SpaceDonate v2.0 - ambiente local</span>
       <span><a href="/donate.html">Donate</a> / <a href="/overlay.html?test=true">Overlay teste</a></span>
     </div>
