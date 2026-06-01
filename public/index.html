@@ -221,6 +221,7 @@
     }
 
     .cta-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; display: block; }
+    #spaceCanvas { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; display: block; }
 
     .hero-notes {
       display: flex;
@@ -763,6 +764,9 @@
     </div>
   </header>
 
+  <!-- Full-viewport canvas for animated planets -->
+  <canvas id="spaceCanvas" aria-hidden="true"></canvas>
+
   <main>
 
   <script>
@@ -1062,6 +1066,93 @@
           { transform: 'translateY(0) scale(1)' }
         ], { duration: 650, easing: 'cubic-bezier(.22,.9,.35,1)'});
       });
+    })();
+  </script>
+  <script>
+    // Full-screen animated planets background (canvas)
+    (function(){
+      const canvas = document.getElementById('spaceCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      let DPR = Math.max(1, window.devicePixelRatio || 1);
+      let W = 0, H = 0;
+      const planets = [];
+
+      function resize(){
+        DPR = Math.max(1, window.devicePixelRatio || 1);
+        const w = Math.floor(window.innerWidth * DPR);
+        const h = Math.floor(window.innerHeight * DPR);
+        if (canvas.width !== w || canvas.height !== h) {
+          canvas.width = w; canvas.height = h;
+          canvas.style.width = window.innerWidth + 'px';
+          canvas.style.height = window.innerHeight + 'px';
+        }
+        W = canvas.width; H = canvas.height;
+      }
+
+      function makePlanets(){
+        planets.length = 0;
+        const count = Math.min(8, Math.max(3, Math.floor(window.innerWidth/220)));
+        for (let i=0;i<count;i++){
+          const baseR = 18 + Math.random()*56;
+          planets.push({
+            cx: Math.random()*W,
+            cy: Math.random()*H*0.7 + H*0.08,
+            r: baseR,
+            hue: 240 + Math.random()*70,
+            speed: (0.002 + Math.random()*0.006) * (Math.random()>0.5? -1:1),
+            phase: Math.random()*Math.PI*2,
+            orbit: 20 + Math.random()*160,
+            glow: 0.06 + Math.random()*0.22
+          });
+        }
+      }
+
+      function drawPlanet(p, t){
+        const time = t * 0.0006;
+        const ox = Math.cos(time * (p.speed*500) + p.phase) * p.orbit;
+        const oy = Math.sin(time * (p.speed*500) + p.phase) * (p.orbit*0.38);
+        const x = (p.cx + ox) / DPR;
+        const y = (p.cy + oy) / DPR;
+        const r = p.r / DPR;
+
+        // glow
+        const g = ctx.createRadialGradient(x, y, r*0.2, x, y, r*3.4);
+        g.addColorStop(0, `hsla(${p.hue},85%,72%,${p.glow})`);
+        g.addColorStop(0.45, `hsla(${p.hue},70%,48%,${p.glow*0.24})`);
+        g.addColorStop(1, `rgba(0,0,0,0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x, y, r*3.2, 0, Math.PI*2); ctx.fill();
+
+        // main body
+        const g2 = ctx.createRadialGradient(x - r*0.35, y - r*0.35, r*0.18, x, y, r);
+        g2.addColorStop(0, `hsla(${p.hue},92%,86%,1)`);
+        g2.addColorStop(0.6, `hsla(${p.hue},72%,48%,1)`);
+        g2.addColorStop(1, `rgba(0,0,0,0.08)`);
+        ctx.fillStyle = g2;
+        ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2); ctx.fill();
+
+        // subtle ring
+        ctx.strokeStyle = `hsla(${p.hue},60%,60%,0.12)`;
+        ctx.lineWidth = Math.max(1, r*0.08);
+        ctx.beginPath(); ctx.ellipse(x, y, r*1.6, r*0.6, Math.PI/6, 0, Math.PI*2); ctx.stroke();
+      }
+
+      let raf = null;
+      function loop(t){
+        ctx.clearRect(0,0,W,H);
+        ctx.globalCompositeOperation = 'lighter';
+        for (let i=0;i<planets.length;i++){ drawPlanet(planets[i], t); }
+        ctx.globalCompositeOperation = 'source-over';
+        raf = requestAnimationFrame(loop);
+      }
+
+      function init(){
+        resize(); makePlanets(); if (!raf) raf = requestAnimationFrame(loop);
+      }
+
+      window.addEventListener('resize', ()=>{ resize(); makePlanets(); });
+      init();
     })();
   </script>
 </body>
