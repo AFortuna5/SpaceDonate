@@ -220,8 +220,7 @@
       pointer-events: none;
     }
 
-    .cta-particles { position: absolute; inset: 0; pointer-events: none; }
-    .cta-particle { position: absolute; width:6px; height:6px; border-radius:50%; background:var(--lilac); opacity:0; transform:translate(-50%,-50%) scale(.6); }
+    .cta-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; display: block; }
 
     .hero-notes {
       display: flex;
@@ -434,10 +433,12 @@
 
     .product-shot {
       margin-top: 32px;
-      border: 1px solid rgba(255,255,255,0.1);
-      background: #0b0c0a;
-      box-shadow: var(--shadow);
+      border: 1px solid rgba(124,58,237,0.12);
+      background: linear-gradient(180deg, rgba(124,58,237,0.03), rgba(14,10,20,0.38));
+      box-shadow: 0 30px 80px rgba(124,58,237,0.08), var(--shadow);
       overflow: hidden;
+      position: relative;
+      border-radius: 12px;
     }
 
     .shot-top {
@@ -494,13 +495,24 @@
       left: 50%;
       top: 48%;
       transform: translate(-50%, -50%);
-      background:
-        radial-gradient(circle at 50% 36%, var(--acid) 0 16%, transparent 17%),
-        radial-gradient(circle at 34% 66%, var(--cyan) 0 12%, transparent 13%),
-        radial-gradient(circle at 66% 66%, var(--pink) 0 12%, transparent 13%),
-        #20241b;
-      border: 1px solid rgba(255,255,255,0.12);
-      clip-path: polygon(50% 0, 95% 24%, 95% 76%, 50% 100%, 5% 76%, 5% 24%);
+      background: radial-gradient(circle at 35% 30%, var(--lilac) 0 8%, rgba(124,58,237,0.75) 30%, rgba(7,6,10,0.95) 70%);
+      border-radius: 50%;
+      box-shadow: 0 8px 30px rgba(124,58,237,0.12), inset 0 -6px 20px rgba(0,0,0,0.6);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+    .avatar-visual::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 52%;
+      width: 260px;
+      height: 40px;
+      transform: translateX(-50%) rotate(-18deg);
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(139,92,246,0.14), rgba(124,58,237,0.06));
+      filter: blur(6px);
+      pointer-events: none;
+      z-index: 0;
     }
 
     .alert-preview {
@@ -545,8 +557,8 @@
     }
 
     .side-box {
-      border: 1px solid rgba(255,255,255,0.08);
-      background: rgba(255,255,255,0.025);
+      border: 1px solid rgba(124,58,237,0.12);
+      background: linear-gradient(180deg, rgba(124,58,237,0.02), rgba(0,0,0,0.28));
       padding: 14px;
     }
 
@@ -805,7 +817,7 @@
           <a class="btn ghost" href="/overlay.html?test=true">Preview do overlay</a>
           <button id="ctaLaunch" class="cta-launch" aria-label="Launch SpaceDonate">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2c0 0-3 7-3.5 9.5S7 16 7 16s3 0 5 2 7 2 7 2-1.5-3.5-4-6S12 2 12 2z" fill="white" opacity="0.95"></path></svg>
-            <div class="cta-particles" aria-hidden="true"></div>
+            <canvas class="cta-canvas" aria-hidden="true"></canvas>
             <div class="label">Launch</div>
           </button>
         </div>
@@ -837,7 +849,7 @@
             <div class="side-stack">
               <div class="side-box"><span>Donates hoje</span><strong>R$ 482,00</strong><div class="meter"><div style="width:72%"></div></div></div>
               <div class="side-box"><span>Meta da live</span><strong>72%</strong><div class="meter"><div style="width:72%"></div></div></div>
-              <div class="side-box"><span>Canais</span><strong>YouTube + Twitch</strong></div>
+              <div class="side-box"><span>Canais</span><strong>Multiplataforma</strong></div>
             </div>
           </div>
         </div>
@@ -968,43 +980,85 @@
     loadAuthStatus()
   </script>
   <script>
-    // CTA particle burst and small launch animation
+    // CTA particle burst using canvas for better perf
     (function(){
       const btn = document.getElementById('ctaLaunch');
       if (!btn) return;
-      const container = btn.querySelector('.cta-particles');
-      function spawnParticles(x,y){
-        const particles = [];
-        for (let i=0;i<14;i++){
-          const p = document.createElement('div');
-          p.className='cta-particle';
-          const angle = Math.random()*Math.PI*2;
-          const dist = 24 + Math.random()*36;
-          const dx = Math.cos(angle)*dist + x;
-          const dy = Math.sin(angle)*dist + y;
-          p.style.left = (50 + Math.cos(angle)*6)+'%';
-          p.style.top = (50 + Math.sin(angle)*6)+'%';
-          container.appendChild(p);
-          particles.push({el:p, dx, dy});
-          (function animate(particle){
-            requestAnimationFrame(()=>{
-              particle.el.style.transition = 'transform 520ms cubic-bezier(.22,.9,.35,1), opacity 520ms ease';
-              particle.el.style.opacity = '1';
-              particle.el.style.transform = `translate(${(particle.dx-50)}px, ${(particle.dy-50)}px) scale(1)`;
-            });
-            setTimeout(()=>{ particle.el.style.opacity='0'; setTimeout(()=>particle.el.remove(),600); }, 520);
-          })(particles[particles.length-1]);
+      const canvas = btn.querySelector('.cta-canvas');
+      if (!canvas) return;
+      let ctx = canvas.getContext('2d');
+      let DPR = Math.max(1, window.devicePixelRatio || 1);
+      let w = 0, h = 0;
+      const particles = [];
+      let raf = null;
+
+      function resize(){
+        DPR = Math.max(1, window.devicePixelRatio || 1);
+        const cw = Math.max(1, Math.floor(btn.clientWidth * DPR));
+        const ch = Math.max(1, Math.floor(btn.clientHeight * DPR));
+        if (canvas.width !== cw || canvas.height !== ch) {
+          canvas.width = cw;
+          canvas.height = ch;
+          canvas.style.width = btn.clientWidth + 'px';
+          canvas.style.height = btn.clientHeight + 'px';
+          ctx = canvas.getContext('2d');
+          ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
         }
+        w = btn.clientWidth;
+        h = btn.clientHeight;
       }
+
+      function spawn(x,y){
+        const now = performance.now();
+        const count = 26;
+        for (let i=0;i<count;i++){
+          const angle = Math.random()*Math.PI*2;
+          const speed = (60 + Math.random()*160) / 1000; // px per ms
+          particles.push({
+            x, y,
+            vx: Math.cos(angle)*speed,
+            vy: Math.sin(angle)*speed - 0.06,
+            born: now,
+            life: 600 + Math.random()*700,
+            r: 1 + Math.random()*3,
+            hue: 260 + Math.random()*40
+          });
+        }
+        if (!raf) loop();
+      }
+
+      function loop(){
+        raf = requestAnimationFrame(loop);
+        const now = performance.now();
+        ctx.clearRect(0,0,w,h);
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          const t = now - p.born;
+          const lifeRatio = t / p.life;
+          if (lifeRatio >= 1) { particles.splice(i,1); continue; }
+          const x = p.x + p.vx * t;
+          const y = p.y + p.vy * t + (0.00006 * t * t); // slight gravity
+          const alpha = 1 - lifeRatio;
+          ctx.beginPath();
+          ctx.fillStyle = `hsla(${p.hue}, 80%, 68%, ${alpha})`;
+          ctx.arc(x, y, p.r * (1 - 0.35*lifeRatio), 0, Math.PI*2);
+          ctx.fill();
+        }
+        if (particles.length === 0) { cancelAnimationFrame(raf); raf = null; ctx.clearRect(0,0,w,h); }
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+
       btn.addEventListener('click', (e)=>{
         const rect = btn.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        spawnParticles(x,y);
+        spawn(x,y);
         // small lift animation
         btn.animate([
           { transform: 'translateY(0) scale(1)' },
-          { transform: 'translateY(-24px) scale(1.06)' },
+          { transform: 'translateY(-22px) scale(1.06)' },
           { transform: 'translateY(0) scale(1)' }
         ], { duration: 650, easing: 'cubic-bezier(.22,.9,.35,1)'});
       });
