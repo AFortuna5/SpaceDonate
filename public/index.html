@@ -170,11 +170,58 @@
 
     .hero-actions {
       margin-top: 32px;
+
+    /* Space-themed accents */
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 6%;
+      width: 720px;
+      height: 720px;
+      transform: translateX(-50%);
+      background: radial-gradient(circle at 30% 30%, rgba(124,58,237,0.06), transparent 12%), radial-gradient(circle at 70% 70%, rgba(139,92,246,0.04), transparent 18%);
+      filter: blur(36px);
+      pointer-events: none;
+      z-index: 0;
+    }
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
       justify-content: center;
     }
+
+    .cta-launch {
+      position: relative;
+      display: inline-grid;
+      place-items: center;
+      width: 56px;
+      height: 56px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--purple), var(--accent));
+      color: white;
+      box-shadow: 0 10px 30px rgba(124,58,237,0.28), 0 2px 6px rgba(0,0,0,0.5) inset;
+      border: 0;
+      cursor: pointer;
+      transition: transform .18s ease, box-shadow .18s ease;
+      z-index: 5;
+    }
+
+    .cta-launch:hover { transform: translateY(-6px) scale(1.03); box-shadow: 0 18px 40px rgba(124,58,237,0.32); }
+
+    .cta-launch .label {
+      position: absolute;
+      top: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.92rem;
+      color: var(--lilac);
+      opacity: 0.96;
+      pointer-events: none;
+    }
+
+    .cta-particles { position: absolute; inset: 0; pointer-events: none; }
+    .cta-particle { position: absolute; width:6px; height:6px; border-radius:50%; background:var(--lilac); opacity:0; transform:translate(-50%,-50%) scale(.6); }
 
     .hero-notes {
       display: flex;
@@ -753,9 +800,14 @@
           SpaceDonate combina página de apoio, overlay transparente e alertas rápidos para transmissões mais envolventes.
         </p>
         <div class="hero-actions">
-          <a class="btn primary" href="/login.html?tab=signup">Comecar agora</a>
-          <a class="btn" href="/donate.html">Ver pagina de donate</a>
+          <a class="btn primary" href="/login.html?tab=signup">Começar agora</a>
+          <a class="btn" href="/donate.html">Ver página de donate</a>
           <a class="btn ghost" href="/overlay.html?test=true">Preview do overlay</a>
+          <button id="ctaLaunch" class="cta-launch" aria-label="Launch SpaceDonate">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><path d="M12 2c0 0-3 7-3.5 9.5S7 16 7 16s3 0 5 2 7 2 7 2-1.5-3.5-4-6S12 2 12 2z" fill="white" opacity="0.95"></path></svg>
+            <div class="cta-particles" aria-hidden="true"></div>
+            <div class="label">Launch</div>
+          </button>
         </div>
         <div class="hero-notes">
           <span>OBS / Browser Source pronto</span>
@@ -914,6 +966,49 @@
     }
 
     loadAuthStatus()
+  </script>
+  <script>
+    // CTA particle burst and small launch animation
+    (function(){
+      const btn = document.getElementById('ctaLaunch');
+      if (!btn) return;
+      const container = btn.querySelector('.cta-particles');
+      function spawnParticles(x,y){
+        const particles = [];
+        for (let i=0;i<14;i++){
+          const p = document.createElement('div');
+          p.className='cta-particle';
+          const angle = Math.random()*Math.PI*2;
+          const dist = 24 + Math.random()*36;
+          const dx = Math.cos(angle)*dist + x;
+          const dy = Math.sin(angle)*dist + y;
+          p.style.left = (50 + Math.cos(angle)*6)+'%';
+          p.style.top = (50 + Math.sin(angle)*6)+'%';
+          container.appendChild(p);
+          particles.push({el:p, dx, dy});
+          (function animate(particle){
+            requestAnimationFrame(()=>{
+              particle.el.style.transition = 'transform 520ms cubic-bezier(.22,.9,.35,1), opacity 520ms ease';
+              particle.el.style.opacity = '1';
+              particle.el.style.transform = `translate(${(particle.dx-50)}px, ${(particle.dy-50)}px) scale(1)`;
+            });
+            setTimeout(()=>{ particle.el.style.opacity='0'; setTimeout(()=>particle.el.remove(),600); }, 520);
+          })(particles[particles.length-1]);
+        }
+      }
+      btn.addEventListener('click', (e)=>{
+        const rect = btn.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        spawnParticles(x,y);
+        // small lift animation
+        btn.animate([
+          { transform: 'translateY(0) scale(1)' },
+          { transform: 'translateY(-24px) scale(1.06)' },
+          { transform: 'translateY(0) scale(1)' }
+        ], { duration: 650, easing: 'cubic-bezier(.22,.9,.35,1)'});
+      });
+    })();
   </script>
 </body>
 </html>
