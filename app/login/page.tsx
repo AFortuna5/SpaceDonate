@@ -1,4 +1,4 @@
-export default function HomePage() {
+export default function Page() {
   return (
     <iframe
       src="/login.html"

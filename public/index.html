@@ -133,11 +133,18 @@
 
     .hero {
       min-height: calc(100dvh - 72px);
-      display: grid;
-      grid-template-columns: minmax(0, 1.04fr) 430px;
-      gap: 44px;
+      display: flex;
+      flex-direction: column;
       align-items: center;
-      padding: 54px 0 72px;
+      justify-content: center;
+      gap: 32px;
+      padding: 48px 0 56px;
+      text-align: center;
+    }
+
+    .hero > div:first-child {
+      width: 100%;
+      max-width: 780px;
     }
 
     .eyebrow {
@@ -164,12 +171,14 @@
     }
 
     h1 {
-      margin-top: 26px;
+      margin-top: 20px;
       font-family: 'Syne', sans-serif;
-      font-size: clamp(3.1rem, 7vw, 6.6rem);
-      line-height: 0.9;
+      font-size: clamp(2.8rem, 5.5vw, 5.2rem);
+      line-height: 1.02;
       letter-spacing: -0.02em;
       max-width: 760px;
+      margin-left: auto;
+      margin-right: auto;
     }
 
     h1 span { color: var(--acid); display: block; }
@@ -187,12 +196,14 @@
       display: flex;
       gap: 12px;
       flex-wrap: wrap;
+      justify-content: center;
     }
 
     .hero-notes {
       display: flex;
       flex-wrap: wrap;
       gap: 12px;
+      justify-content: center;
       margin-top: 18px;
     }
 
@@ -212,10 +223,12 @@
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
-      max-width: 680px;
+      max-width: 720px;
+      justify-items: center;
     }
 
     .metric {
+      min-width: 170px;
       border: 1px solid rgba(255,255,255,0.08);
       background: rgba(255,255,255,0.035);
       padding: 18px;
@@ -758,9 +771,9 @@
     <section class="wrap hero">
       <div>
         <div class="eyebrow">Pix, alertas e widgets para streamers</div>
-        <h1>Receba donates sem tirar a live de orbita<span>e mostre tudo no OBS.</span></h1>
+        <h1>Receba doações com overlay animado e alertas em tempo real.<span>Controle sua live sem perder o foco.</span></h1>
         <p class="lead">
-          SpaceDonate junta pagina de apoio, Pix, overlay animado e leitura de mensagens ao vivo para streamers.
+          SpaceDonate combina página de apoio, overlay transparente e alertas rápidos para transmissões mais envolventes.
         </p>
         <div class="hero-actions">
           <a class="btn primary" href="/login.html?tab=signup">Comecar agora</a>
@@ -769,13 +782,13 @@
         </div>
         <div class="hero-notes">
           <span>OBS / Browser Source pronto</span>
-          <span>Conector YouTube + Twitch</span>
-          <span>Interface leve, mobile-ready</span>
+          <span>Alertas leves e responsivos</span>
+          <span>Design moderno e mobile-first</span>
         </div>
         <div class="trust-row">
           <div class="metric"><strong>2%</strong><span>taxa planejada no Pix</span></div>
           <div class="metric"><strong>OBS</strong><span>overlay transparente pronto</span></div>
-          <div class="metric"><strong>YT + TW</strong><span>conectores para canais</span></div>
+          <div class="metric"><strong>Fast</strong><span>configuração rápida e intuitiva</span></div>
         </div>
 
         <div class="product-shot" aria-label="Previa do painel SpaceDonate">
