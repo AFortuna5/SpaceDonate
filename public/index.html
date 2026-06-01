@@ -5,24 +5,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SpaceDonate - Donates Pix para lives</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=DM+Mono:wght@400;500&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070807;
-      --ink: #f2f4ec;
-      --muted: #878b7d;
-      --soft: #171915;
-      --panel: #0e100d;
-      --line: #272d22;
-      --line2: #394131;
-      --acid: #c8ff00;
-      --acid2: #ecff88;
-      --cyan: #5ce1e6;
-      --pink: #ff4fd8;
+      --bg: #050306; /* near black */
+      --ink: #ffffff; /* white text */
+      --muted: #9ca3af; /* gray */
+      --soft: #0b0b10;
+      --panel: #0f0f13;
+      --line: #1f1f28;
+      --line2: #2b2b34;
+      --purple: #7c3aed;
+      --lilac: #c4b5fd;
+      --accent: #8b5cf6;
+      --muted-2: #6b7280;
       --red: #ff4b4b;
-      --twitch: #9146ff;
-      --youtube: #ff0033;
-      --shadow: 0 30px 90px rgba(0, 0, 0, 0.42);
+      --shadow: 0 30px 90px rgba(0, 0, 0, 0.5);
+      /* legacy aliases used in CSS kept for compatibility */
+      --acid: var(--purple);
+      --acid2: var(--lilac);
+      --cyan: #a78bfa;
+      --pink: #f0abfc;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -31,11 +34,11 @@
     body {
       min-height: 100dvh;
       background:
-        radial-gradient(circle at 12% 16%, rgba(200,255,0,0.16), transparent 25%),
-        radial-gradient(circle at 82% 8%, rgba(92,225,230,0.12), transparent 22%),
-        linear-gradient(180deg, #090a08 0%, #070807 48%, #0d0f0c 100%);
+        radial-gradient(circle at 12% 16%, rgba(124,58,237,0.08), transparent 25%),
+        radial-gradient(circle at 82% 8%, rgba(139,92,246,0.06), transparent 22%),
+        linear-gradient(180deg, #07060a 0%, #050306 48%, #0a0a0d 100%);
       color: var(--ink);
-      font-family: 'Outfit', sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
       overflow-x: hidden;
     }
 
@@ -86,17 +89,8 @@
       letter-spacing: 0.01em;
     }
 
-    .brand-mark {
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      color: #0a0c08;
-      background: var(--acid);
-      box-shadow: 0 0 30px rgba(200,255,0,0.28);
-      font-family: 'DM Mono', monospace;
-      font-weight: 500;
-    }
+    /* brand mark removed per request (kept class for safety) */
+    .brand-mark { display: none !important; }
 
     .nav-links {
       display: flex;
@@ -147,48 +141,31 @@
       max-width: 780px;
     }
 
-    .eyebrow {
-      width: fit-content;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 12px;
-      border: 1px solid rgba(200,255,0,0.25);
-      background: rgba(200,255,0,0.06);
-      color: var(--acid2);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    .eyebrow::before {
-      content: "";
-      width: 7px;
-      height: 7px;
-      background: var(--acid);
-      box-shadow: 0 0 12px var(--acid);
-    }
+    /* eyebrow removed visually */
+    .eyebrow { display: none !important; }
 
     h1 {
-      margin-top: 20px;
-      font-family: 'Syne', sans-serif;
-      font-size: clamp(2.8rem, 5.5vw, 5.2rem);
-      line-height: 1.02;
-      letter-spacing: -0.02em;
-      max-width: 760px;
+      margin-top: 6px;
+      font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue';
+      font-weight: 700;
+      font-size: clamp(2.1rem, 4.6vw, 3.6rem);
+      line-height: 1.03;
+      letter-spacing: -0.01em;
+      max-width: 90vw;
       margin-left: auto;
       margin-right: auto;
+      word-break: keep-all;
+      color: var(--ink);
     }
 
-    h1 span { color: var(--acid); display: block; }
+    h1 span { color: var(--lilac); display: block; }
 
     .lead {
-      margin-top: 24px;
-      max-width: 630px;
-      color: #b6baa9;
-      line-height: 1.75;
-      font-size: 1.05rem;
+      margin-top: 18px;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 1rem;
     }
 
     .hero-actions {
