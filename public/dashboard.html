@@ -330,46 +330,66 @@
   </main>
 
   <script>
-    async function loadUser() {
-      const res = await fetch('/api/auth/me')
-      if (!res.ok) {
-        window.location.href = '/login.html?auth=login_required'
-        return
-      }
-      const { user } = await res.json()
-      document.getElementById('title').textContent = 'Bem-vindo, ' + user.creatorName
-      document.getElementById('creatorName').textContent = user.creatorName
-      document.getElementById('email').textContent = user.email
-      document.getElementById('createdAt').textContent = new Date(user.createdAt).toLocaleDateString('pt-BR')
-    }
+async function loadUser() {
+  const res = await fetch('/api/auth/me')
 
-    async function loadConnections() {
-      const params = new URLSearchParams(location.search)
-      if (params.get('connected')) history.replaceState(null, '', location.pathname)
+  if (!res.ok) {
+    window.location.href = '/login.html?auth=login_required'
+    return
+  }
 
-      const res = await fetch('/api/connections')
-      if (!res.ok) return
-      const data = await res.json()
-      document.querySelectorAll('.connection').forEach(card => {
-        const platform = card.dataset.platform
-        const info = data[platform]
-        if (!info?.connected) return
-        card.classList.add('connected')
-        card.querySelector('small').textContent = info.displayName || 'Conectado'
-        card.querySelector('.btn').textContent = 'Reconectar'
-      })
-    }
+  const { user } = await res.json()
 
-    document.getElementById('donateUrl').textContent = location.origin + '/donate.html'
-    document.getElementById('overlayUrl').textContent = location.origin + '/overlay.html'
+  const displayName =
+    user.creatorName ||
+    user.name ||
+    user.email ||
+    'Usuário'
 
-    document.getElementById('logoutButton').addEventListener('click', async () => {
-      await fetch('/api/auth/logout', { method: 'POST' })
-      window.location.href = '/'
+  const titleElement = document.getElementById('title')
+  const creatorNameElement = document.getElementById('creatorName')
+  const emailElement = document.getElementById('email')
+  const createdAtElement = document.getElementById('createdAt')
+
+  if (titleElement) {
+    titleElement.textContent = `Bem-vindo, ${displayName}`
+  }
+
+  if (creatorNameElement) {
+    creatorNameElement.textContent = displayName
+  }
+
+  if (emailElement) {
+    emailElement.textContent = user.email || 'Sem e-mail'
+  }
+
+  if (createdAtElement && user.createdAt) {
+    createdAtElement.textContent =
+      new Date(user.createdAt).toLocaleDateString('pt-BR')
+  }
+}
+
+loadUser()
+</script>
+<script>
+async function logout() {
+  try {
+    await fetch('/api/auth/logout', {
+      method: 'POST',
     })
 
-    loadUser()
-    loadConnections()
-  </script>
+    localStorage.clear()
+    sessionStorage.clear()
+
+    window.location.href = '/login.html'
+  } catch (error) {
+    console.error('Erro ao sair:', error)
+  }
+}
+
+document
+  .getElementById('logoutButton')
+  ?.addEventListener('click', logout)
+</script>
 </body>
 </html>

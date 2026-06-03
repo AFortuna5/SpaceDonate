@@ -205,27 +205,50 @@
     .footer-note a:hover { text-decoration: underline; }
 
     /* TOAST */
-    .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
-      transform: translateX(-50%) translateY(60px);
-      background: #1f1f23;
-      border: 0.5px solid #2a2a2e;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-size: 13px;
-      color: #efeff1;
-      opacity: 0;
-      transition: transform 0.25s, opacity 0.25s;
-      pointer-events: none;
-      white-space: nowrap;
-      z-index: 999;
-    }
-    .toast.show {
-      transform: translateX(-50%) translateY(0);
-      opacity: 1;
-    }
+.toast {
+  position: fixed;
+
+  left: 50%;
+  bottom: 32px;
+
+  transform: translateX(-50%) translateY(80px);
+
+  background: rgba(20, 20, 30, 0.95);
+  border: 1px solid rgba(255,255,255,0.08);
+
+  border-radius: 14px;
+
+  padding: 14px 22px;
+
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+
+  backdrop-filter: blur(14px);
+
+  box-shadow:
+    0 10px 40px rgba(0,0,0,0.45);
+
+  opacity: 0;
+
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease;
+
+  pointer-events: none;
+
+  z-index: 9999;
+
+  min-width: 280px;
+  max-width: 90vw;
+
+  text-align: center;
+}
+
+.toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
   </style>
   <link rel="stylesheet" href="/space-theme.css">
 </head>

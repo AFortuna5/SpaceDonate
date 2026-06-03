@@ -1,7 +1,7 @@
-
 import { NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { cookies } from "next/headers";
+import { prisma } from "@/lib/prisma";
 
 export async function GET() {
   try {
@@ -18,11 +18,32 @@ export async function GET() {
     const decoded = jwt.verify(
       token.value,
       process.env.JWT_SECRET || "dev-secret"
-    );
+    ) as {
+      id: string;
+      email: string;
+    };
+
+    const user = await prisma.user.findUnique({
+      where: {
+        id: decoded.id,
+      },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Usuário não encontrado." },
+        { status: 404 }
+      );
+    }
 
     return NextResponse.json({
       authenticated: true,
-      user: decoded,
+      user: {
+        id: user.id,
+        creatorName: user.creatorName,
+        email: user.email,
+        createdAt: user.createdAt,
+      },
     });
   } catch {
     return NextResponse.json(
